@@ -16,27 +16,22 @@ import alog
 from caikit.core import ModuleBase, ModuleLoader, ModuleSaver, TaskBase, module, task
 from caikit.core.data_model import DataStream
 from caikit.core.toolkit.errors import error_handler
-from caikit_template.data_model.hello_world import (HelloWorldInput,
-                                                   HelloWorldPrediction,
-                                                   HelloWorldTrainingType)
+from caikit_nlp.modules.embedding_retrieval import EmbeddingRetrievalTask
+from caikit_nlp.data_model.embedding_vectors import EmbeddingResult, Vector1D
+
+from typing import List
 
 import os
 
 logger = alog.use_channel("<SMPL_BLK>")
 error = error_handler.get(logger)
 
-@task(
-    required_parameters={"text_input": HelloWorldInput},
-    output_type=HelloWorldPrediction,
-)
-class HelloWorldTask(TaskBase):
-    pass
 
 @module(
     "00110203-0405-0607-0809-0a0b02dd0e0f",
     "HelloWorldModule",
     "0.0.1",
-    HelloWorldTask,
+    EmbeddingRetrievalTask,
 )
 class HelloWorldModule(ModuleBase):
 
@@ -68,13 +63,13 @@ class HelloWorldModule(ModuleBase):
         model = None  # replace this with model load code such as `torch.load`
         return cls(model)
 
-    def run(self, text_input: HelloWorldInput) -> HelloWorldPrediction:
+    def run(self, text: str) -> EmbeddingResult:
         """Run inference on model.
         Args:
-            text_input: str
+            text: str
                 Input text to be processed
         Returns:
-            HelloWorldPrediction: the output
+            EmbeddingResult: the output
         """
         # This is the main function used for inferencing.
         # NOTE:
@@ -92,8 +87,8 @@ class HelloWorldModule(ModuleBase):
         #    For a batch request, please implement `run_batch` function, which would
         #    accept list of text (as example) as input and return List of
         #    `HelloWorldPrediction` (as an example) as output.
-
-        return HelloWorldPrediction(f"Hello {text_input.name}")
+        return EmbeddingResult([1.23, 2.34])
+        # this works too! return EmbeddingResult([[1.23], [2.34]])
 
     def save(self, model_path, *args, **kwargs):
         """Function to save model in caikit format.
@@ -121,31 +116,6 @@ class HelloWorldModule(ModuleBase):
                 "temp_model_path": temp_model_file
             }
             module_saver.update_config(config_options)
-
-
-
-    @classmethod
-    def train(cls, training_data: DataStream[HelloWorldTrainingType], *args, **kwargs) -> "HelloWorldModule":
-        """Function to take a data stream as input and train a model.
-
-        Note:
-        - This function is primary entry point for all types of models that require
-        either training, tuning, fine-tuning or just configuration.
-        - This function is also used by training API in caikit.runtime to kick off
-        a training in cloud environment.
-        - Input data has to be of `DataStream` type
-
-        Args:
-            training_data: DataStream
-                Training data stream of `HelloWorldTrainingType` type
-        Returns:
-            HelloWorldModule
-                Object of HelloWorldModule as output that can be used to make
-                inference call using `.run` function or persist the model using
-                `.save` function.
-        """
-
-        return cls(model=None)
 
     @classmethod
     def bootstrap(cls, pretrained_model_path):

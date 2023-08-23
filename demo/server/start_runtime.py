@@ -28,7 +28,7 @@ sys.path.append(
 # Local
 import caikit_template
 import caikit
-from caikit.runtime import grpc_server
+from caikit.runtime.__main__ import main
 
 # Load configuration for model(s) serving
 CONFIG_PATH = path.realpath(
@@ -38,5 +38,5 @@ caikit.configure(CONFIG_PATH)
 
 alog.configure(default_level="debug")
 
-# Load the model(s) in a gRPC server
-grpc_server.main()
+# Load the model(s) in gRPC and REST servers
+main()
