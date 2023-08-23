@@ -19,16 +19,12 @@ import sys
 
 # Local
 import caikit
-from caikit.config import configure
 from caikit.runtime.service_factory import ServicePackageFactory
 
-# Since the `caikit_template` package is not installed and it is not present in path,
-# we are adding it directly
+# Add the runtime/library to the path
 sys.path.append(
     path.abspath(path.join(path.dirname(__file__), "../../"))
 )
-
-from caikit_template.data_model.hello_world import HelloWorldInput
 
 # Load configuration for Caikit runtime
 CONFIG_PATH = path.realpath(
@@ -38,7 +34,7 @@ caikit.configure(CONFIG_PATH)
 
 # NOTE: The model id needs to be a path to folder.
 # NOTE: This is relative path to the models directory
-MODEL_ID = "hello_world"
+MODEL_ID = "st"
 
 inference_service = ServicePackageFactory().get_service_package(
     ServicePackageFactory.ServiceType.INFERENCE,
@@ -48,14 +44,17 @@ port = 8085
 channel = grpc.insecure_channel(f"localhost:{port}")
 client_stub = inference_service.stub_class(channel)
 
-## Create request object
-hello_world_proto = HelloWorldInput(name="World").to_proto()
-request = inference_service.messages.HelloWorldTaskRequest(text_input=hello_world_proto)
+# Create request object
+print(dir(inference_service.messages))
 
-## Fetch predictions from server (infer)
-response = client_stub.HelloWorldTaskPredict(
+request = inference_service.messages.EmbeddingRetrievalTaskRequest(text="test with a string")
+
+# Fetch predictions from server (infer)
+
+print(dir(client_stub))
+response = client_stub.EmbeddingRetrievalTaskPredict(
     request, metadata=[("mm-model-id", MODEL_ID)]
 )
 
-## Print response
+# Print response
 print("RESPONSE:", response)

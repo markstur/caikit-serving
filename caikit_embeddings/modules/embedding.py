@@ -15,8 +15,8 @@
 import alog
 from caikit.core import ModuleBase, ModuleLoader, ModuleSaver, module
 from caikit.core.toolkit.errors import error_handler
-from caikit_template.modules.embedding_retrieval import EmbeddingRetrievalTask
-from caikit_template.data_model.embedding_vectors import EmbeddingResult
+from caikit_embeddings.modules.embedding_retrieval import EmbeddingRetrievalTask
+from caikit_embeddings.data_model.embedding_vectors import EmbeddingResult
 
 import os
 
@@ -25,15 +25,15 @@ error = error_handler.get(logger)
 
 
 @module(
-    "00110203-0405-0607-0809-0a0b02dd0e0f",
-    "HelloWorldModule",
+    "EEB12558-B4FA-4F34-A9FD-3F5890E9CD3F",
+    "EmbeddingModule",
     "0.0.1",
     EmbeddingRetrievalTask,
 )
-class HelloWorldModule(ModuleBase):
+class EmbeddingModule(ModuleBase):
 
     def __init__(self, model=None) -> None:
-        """Function to initialize the HelloWorld.
+        """Initialize
         This function gets called by `.load` and `.train` function
         which initializes this module.
         """

@@ -19,14 +19,13 @@ import sys
 # First Party
 import alog
 
-# Since the `caikit_template` package is not installed and it is not present in path,
-# we are adding it directly
+# Add the runtime/library to the path
 sys.path.append(
     path.abspath(path.join(path.dirname(__file__), "../../"))
 )
 
 # Local
-import caikit_template
+import caikit_embeddings
 import caikit
 from caikit.runtime.__main__ import main
 

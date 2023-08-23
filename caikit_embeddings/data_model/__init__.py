@@ -1,4 +1,3 @@
-
 # Copyright The Caikit Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Caikit model configuration
-runtime:
-    # Package name containing the model wrapping
-    library: caikit_template
-
-    # Model wrapping configuration
-    service_generation:
-        primitive_data_model_types:
-            - "caikit_template.data_model.hello_world.HelloWorldInput"
+from .embedding_vectors import *

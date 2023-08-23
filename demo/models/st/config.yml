@@ -12,5 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .hello_world import *
-from .embedding_vectors import *
+block_id: EEB12558-B4FA-4F34-A9FD-3F5890E9CD3F
+name: EmbeddingRetrievalModule
+version: 0.0.1
+hf_model: sentence-transformers/all-MiniLM-L6-v2
