@@ -1,7 +1,1 @@
-../caikit-nlp/dist/caikit_nlp-0.0.1-py3-none-any.whl
 caikit[runtime-grpc, runtime-http]==0.17.0
-# peft@git+https://github.com/mayank31398/peft.git@mpt-os-test --no-index
-# torch>=2.0
-# sentencepiece==0.1.99
-# sentence-transformers==2.2.2
-# transformers~=4.27.1

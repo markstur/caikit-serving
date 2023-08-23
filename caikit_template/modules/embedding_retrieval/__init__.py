@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .hello_world import *
-from .embedding_vectors import *
+# Local
+from .embedding_retrieval_task import EmbeddingRetrievalTask

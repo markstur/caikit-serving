@@ -13,13 +13,10 @@
 # limitations under the License.
 
 import alog
-from caikit.core import ModuleBase, ModuleLoader, ModuleSaver, TaskBase, module, task
-from caikit.core.data_model import DataStream
+from caikit.core import ModuleBase, ModuleLoader, ModuleSaver, module
 from caikit.core.toolkit.errors import error_handler
-from caikit_nlp.modules.embedding_retrieval import EmbeddingRetrievalTask
-from caikit_nlp.data_model.embedding_vectors import EmbeddingResult, Vector1D
-
-from typing import List
+from caikit_template.modules.embedding_retrieval import EmbeddingRetrievalTask
+from caikit_template.data_model.embedding_vectors import EmbeddingResult
 
 import os
 
