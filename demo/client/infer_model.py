@@ -56,5 +56,8 @@ response = client_stub.EmbeddingRetrievalTaskPredict(
 
 # Print response
 print("INPUTS: ", sentences)
-print("RESULTS: ", [d.data for d in response.data])
+print("RESULTS: [")
+for d in response.data:
+    print("  ", d.data)
+print("]")
 print("LENGTH: ", len(response.data), " x ", len(response.data[0].data))
