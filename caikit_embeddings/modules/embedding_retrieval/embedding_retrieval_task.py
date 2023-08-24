@@ -14,13 +14,14 @@
 
 # First Party
 from caikit.core import TaskBase, task
+from typing import List
 
 # Local
 from ...data_model import EmbeddingResult
 
 
 @task(
-    required_parameters={"text": str},
+    required_parameters={"input": List[str]},
     output_type=EmbeddingResult,
 )
 class EmbeddingRetrievalTask(TaskBase):

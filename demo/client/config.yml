@@ -20,8 +20,3 @@ runtime:
 
     # All models in this directory are loaded at boot time
     local_models_dir: "../models"
-
-    # Training configuration
-    training:
-        # The directory to save trained models in
-        output_dir: "../train_output"

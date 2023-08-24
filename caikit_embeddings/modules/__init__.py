@@ -12,4 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .embedding import EmbeddingModule
+from caikit_embeddings.modules.embedding_retrieval.embedding import EmbeddingModule
+from .hf_base import HFBase

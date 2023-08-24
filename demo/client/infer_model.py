@@ -34,7 +34,7 @@ caikit.configure(CONFIG_PATH)
 
 # NOTE: The model id needs to be a path to folder.
 # NOTE: This is relative path to the models directory
-MODEL_ID = "st"
+MODEL_ID = "mini"
 
 inference_service = ServicePackageFactory().get_service_package(
     ServicePackageFactory.ServiceType.INFERENCE,
@@ -45,16 +45,16 @@ channel = grpc.insecure_channel(f"localhost:{port}")
 client_stub = inference_service.stub_class(channel)
 
 # Create request object
-print(dir(inference_service.messages))
 
-request = inference_service.messages.EmbeddingRetrievalTaskRequest(text="test with a string")
+sentences = ["test first sentence", "another test sentence"]
+request = inference_service.messages.EmbeddingRetrievalTaskRequest(input=sentences)
 
 # Fetch predictions from server (infer)
-
-print(dir(client_stub))
 response = client_stub.EmbeddingRetrievalTaskPredict(
     request, metadata=[("mm-model-id", MODEL_ID)]
 )
 
 # Print response
-print("RESPONSE:", response)
+print("INPUTS: ", sentences)
+print("RESULTS: ", [d.data for d in response.data])
+print("LENGTH: ", len(response.data), " x ", len(response.data[0].data))

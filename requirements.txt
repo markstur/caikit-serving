@@ -1,1 +1,3 @@
-caikit[runtime-grpc, runtime-http]==0.17.0
+caikit[runtime-grpc, runtime-http]==0.17.1
+sentence-transformers==2.2.2
+transformers[torch]==4.32.0
