@@ -1,9 +1,8 @@
-﻿kind: DeploymentConfig
+kind: DeploymentConfig
 apiVersion: apps.openshift.io/v1
 metadata:
   name: caikit-embeddings
-  namespace: fmaas-stack-models
-  generation: 11
+  namespace: caikit-embeddings-test
 spec:
   strategy:
     type: Rolling
@@ -28,9 +27,14 @@ spec:
       labels:
         app: caikit-embeddings
     spec:
+      volumes:
+        - name: cos-pvc
+          persistentVolumeClaim:
+            claimName: pvc-caikit-embeddings-cos
       containers:
-        - name: container
-          image: 'icr.io/fm-stack/caikit-embeddings:latest'
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: container
           command:
             - bash
             - '-c'
@@ -38,14 +42,27 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
           imagePullPolicy: Always
+          volumeMounts:
+            - name: cos-pvc
+              mountPath: /opt/app-root/src/.cache/huggingface/sentence_transformers/
+              subPath: models/
+          terminationMessagePolicy: File
+          image: 'icr.io/fm-stack/caikit-embeddings:latest'
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       securityContext: {}
       imagePullSecrets:
-        - name: icr-image-push
+        - name: icr-caikit-image
       schedulerName: default-scheduler
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: icr-caikit-image
+  namespace: caikit-embeddings-test
+data:
+  .dockerconfigjson: <base64 encoded dockerconfigjson>
+type: kubernetes.io/dockerconfigjson
+
