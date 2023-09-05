@@ -32,7 +32,9 @@ spec:
           persistentVolumeClaim:
             claimName: pvc-caikit-embeddings-cos
       containers:
-        - resources: {}
+        - resources:
+            limits:
+              nvidia.com/gpu: "1"
           terminationMessagePath: /dev/termination-log
           name: container
           command:
