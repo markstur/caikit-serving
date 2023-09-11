@@ -31,12 +31,15 @@ spec:
         - name: cos-pvc
           persistentVolumeClaim:
             claimName: pvc-caikit-embeddings-cos
+        - name: cache-pvc
+          persistentVolumeClaim:
+            claimName: pvc-caikit-embeddings-cache
       containers:
         - resources:
             limits:
               nvidia.com/gpu: "1"
-          terminationMessagePath: /dev/termination-log
-          name: container
+        - name: container
+          image: 'icr.io/fm-stack/caikit-embeddings:latest'
           command:
             - bash
             - '-c'
@@ -44,13 +47,21 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          imagePullPolicy: Always
+          env:
+            - name: TRANSFORMERS_CACHE
+              value: /opt/app-root/src/.cache/huggingface/sentence_transformers/
+            - name: HUGGINGFACE_HUB_CACHE
+              value: $(TRANSFORMERS_CACHE)
           volumeMounts:
             - name: cos-pvc
               mountPath: /opt/app-root/src/.cache/huggingface/sentence_transformers/
               subPath: models/
+            - name: cache-pvc
+              mountPath: /opt/app-root/src/.cache/huggingface/hub/
+              subPath: transformers_cache/
+          terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          image: 'icr.io/fm-stack/caikit-embeddings:latest'
+          imagePullPolicy: Always
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
