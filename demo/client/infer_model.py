@@ -16,6 +16,7 @@
 import grpc
 from os import path
 import sys
+import os
 
 # Local
 import caikit
@@ -40,8 +41,9 @@ inference_service = ServicePackageFactory().get_service_package(
     ServicePackageFactory.ServiceType.INFERENCE,
 )
 
-port = 8085
-channel = grpc.insecure_channel(f"localhost:{port}")
+port = os.getenv('CAIKIT_EMBEDDINGS_PORT') if os.getenv('CAIKIT_EMBEDDINGS_PORT') else 8085
+host = os.getenv('CAIKIT_EMBEDDINGS_HOST') if os.getenv('CAIKIT_EMBEDDINGS_HOST') else 'localhost'
+channel = grpc.insecure_channel(f"{host}:{port}")
 client_stub = inference_service.stub_class(channel)
 
 # Create request object
