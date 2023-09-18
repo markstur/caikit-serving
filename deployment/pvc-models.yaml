@@ -2,7 +2,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: pvc-caikit-embeddings-cos
-  namespace: caikit-embeddings-test
 spec:
   accessModes:
     - ReadWriteMany
@@ -30,7 +29,6 @@ metadata:
     ibm.io/cos-service: ''
     ibm.io/endpoint: 'https://s3.direct.us-south.cloud-object-storage.appdomain.cloud'
     ibm.io/secret-name: caikit-embeddings-cos
-    ibm.io/secret-namespace: caikit-embeddings-test
     pv.kubernetes.io/provisioned-by: ibm.io/ibmc-s3fs
   finalizers:
     - kubernetes.io/pv-protection
@@ -41,7 +39,6 @@ spec:
     driver: ibm/ibmc-s3fs
     secretRef:
       name: caikit-embeddings-cos
-      namespace: caikit-embeddings-test
     options:
       chunk-size-mb: '16'
       stat-cache-size: '100000'
@@ -61,7 +58,6 @@ spec:
     - ReadWriteMany
   claimRef:
     kind: PersistentVolumeClaim
-    namespace: caikit-embeddings-test
     name: pvc-caikit-embeddings-cos
   persistentVolumeReclaimPolicy: Delete
   storageClassName: ibmc-s3fs-smart-regional
@@ -71,7 +67,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: pvc-caikit-embeddings-cache
-  namespace: caikit-embeddings-test
 spec:
   accessModes:
     - ReadWriteMany
@@ -93,7 +88,6 @@ metadata:
     ibm.io/cos-service: ''
     ibm.io/endpoint: 'https://s3.direct.us-south.cloud-object-storage.appdomain.cloud'
     ibm.io/secret-name: caikit-embeddings-cos
-    ibm.io/secret-namespace: caikit-embeddings-test
     pv.kubernetes.io/provisioned-by: ibm.io/ibmc-s3fs
   finalizers:
     - kubernetes.io/pv-protection
@@ -104,7 +98,6 @@ spec:
     driver: ibm/ibmc-s3fs
     secretRef:
       name: caikit-embeddings-cos
-      namespace: caikit-embeddings-test
     options:
       chunk-size-mb: '16'
       stat-cache-size: '100000'
@@ -124,7 +117,6 @@ spec:
     - ReadWriteMany
   claimRef:
     kind: PersistentVolumeClaim
-    namespace: caikit-embeddings-test
     name: pvc-caikit-embeddings-cache
   persistentVolumeReclaimPolicy: Delete
   storageClassName: ibmc-s3fs-smart-regional
@@ -134,7 +126,6 @@ kind: Secret
 apiVersion: v1
 metadata:
   name: caikit-embeddings-cos
-  namespace: caikit-embeddings-test
 data:
   access-key: <access-key-base64>
   secret-key: <secret-key-base64>

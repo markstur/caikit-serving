@@ -2,7 +2,6 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: caikit-embeddings-route
-  namespace: caikit-embeddings-test
   annotations:
     openshift.io/host.generated: 'true'
 spec:

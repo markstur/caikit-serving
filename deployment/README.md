@@ -32,3 +32,29 @@ The code for enabling GPU resource usage for sentence-transformers already handl
       nvidia.com/gpu: "1"
 ```
 Under `spec > spec > container > resources`, the above lines provide the GPU availability in cluster to be allocated.
+
+## Enabling the gRPC UI for the service
+
+1. Add another port to the current deployed service to expose the gRPC one:
+```yaml
+  ports:
+    - name: server-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: grpc-port
+      protocol: TCP
+      port: 8085
+      targetPort: 8085
+```
+2. Create a deployment using the file [deployment-caikit-emb-grpc-ui.yaml](deployment-caikit-emb-grpc-ui.yaml).
+
+```bash
+oc apply -f deployment-caikit-emb-grpc-ui.yaml
+```
+This will create the deployment, service and route to access the gRPC at the browser. \
+
+> Remember to check if the host passed as parameters in `spec > containers > args` on the gRPC UI deployment has the same name as the caikit embeddings service.
+
+Opening the route created, you should be able to see this view:
+![grpc_ui](./assets/grpc-ui.png)
