@@ -1,0 +1,93 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: caikit-embeddings-grpcui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: grpcui
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        deployment: grpcui
+    spec:
+      volumes:
+        - name: server-tls
+          secret:
+            secretName: fmaas-caikit-trainer-tls
+            defaultMode: 256
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: grpcui
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: server-tls
+              readOnly: true
+              mountPath: /tls/server
+          terminationMessagePolicy: File
+          image: fullstorydev/grpcui
+          args:
+            - '-plaintext'
+            - 'caikit-embeddings-service:8085'
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: grpcui
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    deployment: grpcui
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: caikit-embeddings-grpcui
+spec:
+  host: >-
+    caikit-embeddings-grpcui-<oc-project-name>.<cluster-host>.<cluster-domain>
+  to:
+    kind: Service
+    name: grpcui
+    weight: 100
+  port:
+    targetPort: 8080
+  wildcardPolicy: None
+status:
+  ingress:
+    - host: >-
+            caikit-embeddings-grpcui-<oc-project-name>.<cluster-host>.<cluster-domain>
+      routerName: default
+      conditions:
+        - type: Admitted
+          status: 'True'
+      wildcardPolicy: None
+      routerCanonicalHostname: >-
+        router-default.<cluster-host>.<cluster-domain>
