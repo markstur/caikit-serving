@@ -15,6 +15,7 @@
 """
 
 # Standard
+import numpy as np
 from typing import List
 
 # First Party
@@ -31,6 +32,10 @@ class Vector1D(DataObjectBase):
     """Data representation for a 1 dimension vector."""
 
     data: List[float]
+
+    def to_dict(self) -> dict:
+        # If data is in np.ndarray format, convert it to python list
+        return {"data": self.data.tolist()} if isinstance(self.data, np.ndarray) else {"data": self.data}
 
 
 @dataobject(package="caikit_data_model.caikit_nlp")
