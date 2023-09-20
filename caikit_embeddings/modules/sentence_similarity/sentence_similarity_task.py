@@ -12,6 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from caikit_embeddings.modules.embedding_retrieval.embedding import EmbeddingModule
-from caikit_embeddings.modules.sentence_similarity.sentence_similarity import SentenceSimilarity
-from .hf_base import HFBase
+# First Party
+from caikit.core import TaskBase, task
+from caikit.interfaces.common.data_model.primitive_sequences import FloatSequence
+
+from typing import List
+
+
+@task(
+    required_parameters={"source_sentence": str, "sentences": List[str]},
+    output_type=FloatSequence
+)
+class SentenceSimilarityTask(TaskBase):
+    pass
