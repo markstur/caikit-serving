@@ -12,6 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from caikit_embeddings.modules.embedding_retrieval.embedding import EmbeddingModule
-from caikit_embeddings.modules.sentence_similarity.sentence_similarity import SentenceSimilarity
-from .hf_base import HFBase
+# Local
+from .sentence_similarity_task import SentenceSimilarityTask

@@ -2,6 +2,15 @@
 
 Caikit service for embeddings.
 
+## Example models
+
+This repo includes a `models` directory which configures 2 model instances for testing.
+
+| Model ID | Use case                               |
+|----------|----------------------------------------|
+| mini       | Example for embedding retreival module |
+| mini-ss    | Example for sentence similarity module |
+
 ## Try it out
 
 The repository contains an example configuration to use the sentence-transformers/all-MiniLM-L6-v2 model from huggingface. The model will be downloaded and cached locally.
@@ -37,9 +46,9 @@ cd demo/server
 python3 start_runtime.py
 ```
 
-### Inferencing the Served Model
+### Embedding retrieval client
 
-In another terminal, run the client code to infer the model:
+In another terminal, run the client code to retrieve embeddings.
 
 ```shell
 source venv/bin/activate
@@ -59,6 +68,27 @@ RESULTS: [
    [0.04209445044398308, 0.07522737234830856, 0.018512120470404625, ...]
 ]
 LENGTH:  2  x  384
+```
+
+### Sentence similarity client
+
+In another terminal, run the client code to infer sentence similarity.
+
+```shell
+source venv/bin/activate
+cd demo/client
+python3 sentence_similarity.py
+```
+
+The client code calls the model and queries sentence similarity using 1 source sentence and 2 other sentences (hardcoded in sentence_similarity.py). The result produces the cosine similarity score by comparing the source sentence with each of the other sentences.
+
+You should see output similar to the following:
+
+```ShellSession
+$ python3 sentence_similarity.py   
+SOURCE SENTENCE:  first sentence
+SENTENCES:  ['test first sentence', 'another test sentence']
+RESULTS:  [0.6898421049118042, 0.5583217144012451]
 ```
 
 ### Try the REST API using the FastAPI GUI
