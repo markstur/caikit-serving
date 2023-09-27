@@ -12,5 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .embedding_vectors import *
-from .reranker import *
+from .rerank_task import RerankTask

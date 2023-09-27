@@ -14,4 +14,5 @@
 
 from caikit_embeddings.modules.embedding_retrieval.embedding import EmbeddingModule
 from caikit_embeddings.modules.sentence_similarity.sentence_similarity import SentenceSimilarity
+from caikit_embeddings.modules.reranker.rerank import Rerank
 from .hf_base import HFBase
