@@ -77,24 +77,14 @@ class Rerank(HFBase, ModuleBase):
         if len(queries) < 1:
             return RerankPrediction()
 
-        # TODO: Add List[str] as alternative to documents or remove these conditionals
-        string_input = not isinstance(documents, RerankDocuments)
-        if string_input:
-            if len(documents) < 1:
-                return RerankPrediction()
-        else:
-            if len(documents.documents) < 1:
-                return RerankPrediction()
+        if len(documents.documents) < 1:
+            return RerankPrediction()
 
         if top_k < 1:
             top_k = 10  # Default to 10 (instead of JSON default 0)
 
-        if string_input:
-            # Using list of str for input texts
-            doc_texts = documents
-        else:
-            # Using input document dicts so get "text" else "_text" else default to ""
-            doc_texts = [srd.document.get("text") or srd.document.get("_text", "") for srd in documents.documents]
+        # Using input document dicts so get "text" else "_text" else default to ""
+        doc_texts = [srd.document.get("text") or srd.document.get("_text", "") for srd in documents.documents]
 
         doc_embeddings = self.model.encode(doc_texts, convert_to_tensor=True)
         doc_embeddings = doc_embeddings.to(self.model.device)
@@ -106,16 +96,10 @@ class Rerank(HFBase, ModuleBase):
 
         res = semantic_search(query_embeddings, doc_embeddings, top_k=top_k, score_function=dot_score)
 
-        if string_input:  # documents was just a List[str], set the str as text in output document dict
-            for r in res:
-                for x in r:
-                    x['document'] = {"text": doc_texts[x['corpus_id']]}
-        else:
-            for r in res:
-                for x in r:
-                    x['document'] = documents.documents[x['corpus_id']].document
+        for r in res:
+            for x in r:
+                x['document'] = documents.documents[x['corpus_id']].document
 
         results = [RerankQueryResult([RerankScore(**x) for x in r]) for r in res]
-        print(results)
 
         return RerankPrediction(results=results)
