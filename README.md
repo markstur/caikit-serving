@@ -8,7 +8,8 @@ This repo includes a `models` directory which configures 2 model instances for t
 
 | Model ID | Use case                               |
 |----------|----------------------------------------|
-| mini       | Example for embedding retreival module |
+| mini       | Example for embedding retrieval module |
+| mini-rr    | Example for reranker module            |
 | mini-ss    | Example for sentence similarity module |
 
 ## Try it out
@@ -43,7 +44,7 @@ In one terminal, start the runtime server:
 ```shell
 source venv/bin/activate
 cd demo/server
-python3 start_runtime.py
+python start_runtime.py
 ```
 
 ### Embedding retrieval client
@@ -53,7 +54,7 @@ In another terminal, run the client code to retrieve embeddings.
 ```shell
 source venv/bin/activate
 cd demo/client
-python3 infer_model.py
+python embeddings.py
 ```
 
 The client code calls the model and queries for embeddings using 2 example sentences (hardcoded in infer_model.py).
@@ -61,7 +62,7 @@ The client code calls the model and queries for embeddings using 2 example sente
 You should see output similar to the following:
 
 ```ShellSession
-$ python3 infer_model.py
+$ python embeddings.py
 INPUTS:  ['test first sentence', 'another test sentence']
 RESULTS: [
    [0.02021969109773636, 0.07058270275592804, 0.008317082189023495, ...]
@@ -77,7 +78,7 @@ In another terminal, run the client code to infer sentence similarity.
 ```shell
 source venv/bin/activate
 cd demo/client
-python3 sentence_similarity.py
+python sentence_similarity.py
 ```
 
 The client code calls the model and queries sentence similarity using 1 source sentence and 2 other sentences (hardcoded in sentence_similarity.py). The result produces the cosine similarity score by comparing the source sentence with each of the other sentences.
@@ -85,10 +86,94 @@ The client code calls the model and queries sentence similarity using 1 source s
 You should see output similar to the following:
 
 ```ShellSession
-$ python3 sentence_similarity.py   
+$ python sentence_similarity.py   
 SOURCE SENTENCE:  first sentence
 SENTENCES:  ['test first sentence', 'another test sentence']
 RESULTS:  [0.6898421049118042, 0.5583217144012451]
+```
+
+### Reranker client
+
+In another terminal, run the client code to execute the reranker task using both gRPC and REST.
+
+```shell
+source venv/bin/activate
+cd demo/client
+python reranker.py
+```
+
+You should see output similar to the following:
+
+```ShellSession
+$ python reranker.py
+======================
+TOP K:  2
+QUERIES:  ['first sentence', 'any sentence']
+DOCUMENTS:  [{'document': {'text': 'first sentence', 'title': 'first title'}}, {'document': {'_text': 'another sentence', 'more': 'more attributes here'}}, {'document': {'nothing': ''}}]
+======================
+RESPONSE from gRPC:
+===
+QUERY:  first sentence
+  score: 1.0  corpus_id: 0
+             text: first sentence
+             title: first title
+  score: 0.7350106835365295  corpus_id: 1
+             _text: another sentence
+             more: more attributes here
+===
+QUERY:  any sentence
+  score: 0.6631793975830078  corpus_id: 0
+             text: first sentence
+             title: first title
+  score: 0.650596022605896  corpus_id: 1
+             _text: another sentence
+             more: more attributes here
+===================
+RESPONSE from HTTP:
+{
+    "results": [
+        {
+            "scores": [
+                {
+                    "document": {
+                        "text": "first sentence",
+                        "title": "first title"
+                    },
+                    "corpus_id": 0,
+                    "score": 1.0
+                },
+                {
+                    "document": {
+                        "_text": "another sentence",
+                        "more": "more attributes here"
+                    },
+                    "corpus_id": 1,
+                    "score": 0.7350106835365295
+                }
+            ]
+        },
+        {
+            "scores": [
+                {
+                    "document": {
+                        "text": "first sentence",
+                        "title": "first title"
+                    },
+                    "corpus_id": 0,
+                    "score": 0.6631793975830078
+                },
+                {
+                    "document": {
+                        "_text": "another sentence",
+                        "more": "more attributes here"
+                    },
+                    "corpus_id": 1,
+                    "score": 0.650596022605896
+                }
+            ]
+        }
+    ]
+}
 ```
 
 ### Try the REST API using the FastAPI GUI

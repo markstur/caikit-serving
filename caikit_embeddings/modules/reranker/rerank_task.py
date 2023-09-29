@@ -12,5 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .embedding_vectors import *
-from .reranker import *
+import alog
+from caikit.core import TaskBase, task
+from caikit.core.toolkit.errors import error_handler
+from caikit_embeddings.data_model.reranker import RerankPrediction, RerankDocuments
+
+from typing import List
+
+logger = alog.use_channel("<SMPL_BLK>")
+error = error_handler.get(logger)
+
+@task(
+    required_parameters={
+        "documents": RerankDocuments,
+        "queries": List[str],
+    },
+    output_type=RerankPrediction,
+)
+class RerankTask(TaskBase):
+    pass
