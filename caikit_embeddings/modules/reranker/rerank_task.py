@@ -14,7 +14,7 @@
 
 import alog
 from caikit.core import TaskBase, task
-from caikit.core.toolkit.errors import error_handler
+from caikit.core.exceptions import error_handler
 from caikit_embeddings.data_model.reranker import RerankPrediction, RerankDocuments
 
 from typing import List

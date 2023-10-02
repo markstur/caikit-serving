@@ -12,45 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+# Standard libraries
+import os
+from pathlib import Path
+
 # Third Party
-from transformers import AutoModel, AutoTokenizer
+from sentence_transformers import SentenceTransformer
 
 # Local
 from caikit.core import ModuleConfig
 
-DEFAULT_MODEL = None
-DEFAULT_MODEL_REVISION = None
+DEFAULT_HF_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+HOME = Path.home()
 
 
 class HFBase:
-    def __init__(self, model=None, tokenizer=None) -> None:
+    def __init__(self, model_config_path) -> None:
         """This function gets called by `.load` and `.train` function
         which initializes this module.
         """
-        super().__init__()
-        self.model = model
-        self.tokenizer = tokenizer
+        config = ModuleConfig.load(model_config_path)
+        load_path = config.get("load_path")
 
-    @classmethod
-    def read_config(cls, model_name_or_path, default_model, default_model_revision):
-        config = ModuleConfig.load(model_name_or_path)
-        model_name = config.get("hf_model", default_model)
-        model_revision = config.get("hf_model_revision", default_model_revision)
-        return model_name, model_revision
+        artifact_path = False
+        if load_path:
+            if os.path.isdir(load_path):
+                artifact_path = load_path
+            else:
+                full_path = os.path.join(model_config_path, load_path)
+                if os.path.isdir(full_path):
+                    artifact_path = full_path
 
-    @classmethod
-    def load(cls, model_config_path: str):
-        model_name, model_revision = cls.read_config(
-            model_config_path, DEFAULT_MODEL, DEFAULT_MODEL_REVISION
-        )
-        return cls.bootstrap(model_name, revision=model_revision)
+        if not artifact_path:
+            artifact_path = config.get("hf_model", DEFAULT_HF_MODEL)
 
-    @classmethod
-    def bootstrap(cls, pretrained_model_name_or_path: str, revision=None):
-        tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model_name_or_path, revision=revision
+        self.model = SentenceTransformer(
+            artifact_path,
+            cache_folder=f"{HOME}/.cache/huggingface/sentence_transformers"
         )
-        model = AutoModel.from_pretrained(
-            pretrained_model_name_or_path, revision=revision
-        )
-        return cls(model, tokenizer)
