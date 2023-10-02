@@ -64,12 +64,12 @@ class Rerank(HFBase, ModuleBase):
         """
         return cls(model_path)
 
-    def run(self, queries: List[str], documents: RerankDocuments, top_k: int = 10) -> RerankPrediction:
+    def run(self, queries: List[str], documents: RerankDocuments, top_n: int = 10) -> RerankPrediction:
         """Run inference on model.
         Args:
             queries: List[str]
             documents:  RerankDocuments
-            top_k:  int
+            top_n:  int
         Returns:
             RerankPrediction
         """
@@ -80,8 +80,8 @@ class Rerank(HFBase, ModuleBase):
         if len(documents.documents) < 1:
             return RerankPrediction()
 
-        if top_k < 1:
-            top_k = 10  # Default to 10 (instead of JSON default 0)
+        if top_n < 1:
+            top_n = 10  # Default to 10 (to avoid JSON default 0)
 
         # Using input document dicts so get "text" else "_text" else default to ""
         doc_texts = [srd.document.get("text") or srd.document.get("_text", "") for srd in documents.documents]
@@ -94,7 +94,7 @@ class Rerank(HFBase, ModuleBase):
         query_embeddings = query_embeddings.to(self.model.device)
         query_embeddings = normalize_embeddings(query_embeddings)
 
-        res = semantic_search(query_embeddings, doc_embeddings, top_k=top_k, score_function=dot_score)
+        res = semantic_search(query_embeddings, doc_embeddings, top_k=top_n, score_function=dot_score)
 
         for r in res:
             for x in r:

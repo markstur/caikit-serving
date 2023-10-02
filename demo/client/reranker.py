@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     model_id = "mini-rr"
 
-    top_k = 2
+    top_n = 2
     queries = ["first sentence", "any sentence"]
     documents = [
         {"document": {
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     ]
 
     print("======================")
-    print("TOP K: ", top_k)
+    print("TOP N: ", top_n)
     print("QUERIES: ", queries)
     print("DOCUMENTS: ", documents)
     print("======================")
@@ -100,8 +100,7 @@ if __name__ == "__main__":
         docs = rerank_docs(documents=documents)
 
         # gRPC request
-        request = rerank_request(queries=queries, top_k=2)
-        request = rerank_request(queries=queries, documents=docs, top_k=2)
+        request = rerank_request(queries=queries, documents=docs, top_n=2)
         response = client_stub.RerankTaskPredict(
             request, metadata=[("mm-model-id", model_id)], timeout=1)
 
@@ -122,10 +121,8 @@ if __name__ == "__main__":
         payload = {
             "inputs": {
                 "documents": {"documents": documents},
-                "queries": queries
-            },
-            "parameters": {
-                "top_k": 2
+                "queries": queries,
+                "top_n": 2
             }
         }
         response = requests.post(
