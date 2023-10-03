@@ -24,8 +24,9 @@ error = error_handler.get(logger)
 
 @task(
     required_parameters={
-        "documents": RerankDocuments,
         "queries": List[str],
+        "documents": RerankDocuments,
+        "top_n": int,
     },
     output_type=RerankPrediction,
 )
