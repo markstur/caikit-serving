@@ -12,25 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import alog
 from caikit.core import module, ModuleBase
-from caikit.core.toolkit.errors import error_handler
+from caikit.core.exceptions import error_handler
 from caikit_embeddings.data_model.reranker import RerankPrediction, RerankQueryResult, RerankScore, RerankDocuments
 from caikit_embeddings.modules.reranker import RerankTask
 
-from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import semantic_search, normalize_embeddings, dot_score
 
 from ..hf_base import HFBase
 
-from pathlib import Path
 from typing import List
 
 logger = alog.use_channel("<EMBD_BLK>")
 error = error_handler.get(logger)
-
-DEFAULT_HF_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-HOME = Path.home()
 
 
 @module(
@@ -46,14 +42,7 @@ class Rerank(HFBase, ModuleBase):
         This function gets called by `.load` and `.train` function
         which initializes this module.
         """
-        super().__init__()
-        hf_model, _hf_revision = self.read_config(
-            model_config_path, DEFAULT_HF_MODEL, None
-        )
-        self.model = SentenceTransformer(
-            hf_model,
-            cache_folder=f"{HOME}/.cache/huggingface/sentence_transformers"
-        )
+        super().__init__(model_config_path)
 
     @classmethod
     def load(cls, model_path: str, **kwargs):
