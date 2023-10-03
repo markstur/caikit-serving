@@ -36,6 +36,8 @@ class HFBase:
 
         artifact_path = False
         if load_path:
+            print("<--------------------------- load_path --------------------------->")
+            print(load_path)
             if os.path.isdir(load_path):
                 artifact_path = load_path
             else:
@@ -45,6 +47,8 @@ class HFBase:
 
         if not artifact_path:
             artifact_path = config.get("hf_model", DEFAULT_HF_MODEL)
+            print("<--------------------------- artifact_path --------------------------->")
+            print(artifact_path)
 
         self.model = SentenceTransformer(
             artifact_path,
