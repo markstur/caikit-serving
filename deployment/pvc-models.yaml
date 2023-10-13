@@ -8,7 +8,6 @@ spec:
   resources:
     requests:
       storage: '1'
-  volumeName: pvc-models
   storageClassName: ibmc-s3fs-smart-regional
   volumeMode: Filesystem
 status:
@@ -17,51 +16,6 @@ status:
     - ReadWriteMany
   capacity:
     storage: '1'
----
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: pvc-models
-  annotations:
-    ibm.io/auto-create-bucket: 'false'
-    ibm.io/auto-delete-bucket: 'false'
-    ibm.io/bucket: fmaas-stack-all-in-one
-    ibm.io/cos-service: ''
-    ibm.io/endpoint: 'https://s3.direct.us-south.cloud-object-storage.appdomain.cloud'
-    ibm.io/secret-name: caikit-embeddings-cos
-    pv.kubernetes.io/provisioned-by: ibm.io/ibmc-s3fs
-  finalizers:
-    - kubernetes.io/pv-protection
-spec:
-  capacity:
-    storage: '1'
-  flexVolume:
-    driver: ibm/ibmc-s3fs
-    secretRef:
-      name: caikit-embeddings-cos
-    options:
-      chunk-size-mb: '16'
-      stat-cache-size: '100000'
-      tls-cipher-suite: default
-      parallel-count: '2'
-      bucket: fmaas-stack-all-in-one
-      debug-level: warn
-      object-store-storage-class: us-south-smart
-      access-mode: ReadWriteMany
-      iam-endpoint: 'https://iam.cloud.ibm.com'
-      object-store-endpoint: 'https://s3.direct.us-south.cloud-object-storage.appdomain.cloud'
-      kernel-cache: 'true'
-      curl-debug: 'false'
-      multireq-max: '20'
-      s3fs-fuse-retry-count: '5'
-  accessModes:
-    - ReadWriteMany
-  claimRef:
-    kind: PersistentVolumeClaim
-    name: pvc-caikit-embeddings-cos
-  persistentVolumeReclaimPolicy: Delete
-  storageClassName: ibmc-s3fs-smart-regional
-  volumeMode: Filesystem
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -73,52 +27,31 @@ spec:
   resources:
     requests:
       storage: '1'
-  volumeName: pvc-cache
   storageClassName: ibmc-s3fs-smart-regional
   volumeMode: Filesystem
 ---
-kind: PersistentVolume
+kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: pvc-cache
+  name: pvc-caikit-embeddings-models
   annotations:
-    ibm.io/auto-create-bucket: 'false'
-    ibm.io/auto-delete-bucket: 'false'
-    ibm.io/bucket: fmaas-stack-all-in-one
     ibm.io/cos-service: ''
     ibm.io/endpoint: 'https://s3.direct.us-south.cloud-object-storage.appdomain.cloud'
-    ibm.io/secret-name: caikit-embeddings-cos
+    volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
+    ibm.io/auto-create-bucket: 'false'
     pv.kubernetes.io/provisioned-by: ibm.io/ibmc-s3fs
+    ibm.io/secret-name: caikit-embeddings-cos
+    ibm.io/bucket: caikit-embeddings-models-config
+    volume.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
+    ibm.io/auto-delete-bucket: 'false'
   finalizers:
-    - kubernetes.io/pv-protection
+    - kubernetes.io/pvc-protection
 spec:
-  capacity:
-    storage: '1'
-  flexVolume:
-    driver: ibm/ibmc-s3fs
-    secretRef:
-      name: caikit-embeddings-cos
-    options:
-      chunk-size-mb: '16'
-      stat-cache-size: '100000'
-      tls-cipher-suite: default
-      parallel-count: '2'
-      bucket: fmaas-stack-all-in-one
-      debug-level: warn
-      object-store-storage-class: us-south-smart
-      access-mode: ReadWriteMany
-      iam-endpoint: 'https://iam.cloud.ibm.com'
-      object-store-endpoint: 'https://s3.direct.us-south.cloud-object-storage.appdomain.cloud'
-      kernel-cache: 'true'
-      curl-debug: 'false'
-      multireq-max: '20'
-      s3fs-fuse-retry-count: '5'
   accessModes:
     - ReadWriteMany
-  claimRef:
-    kind: PersistentVolumeClaim
-    name: pvc-caikit-embeddings-cache
-  persistentVolumeReclaimPolicy: Delete
+  resources:
+    requests:
+      storage: '1'
   storageClassName: ibmc-s3fs-smart-regional
   volumeMode: Filesystem
 ---
