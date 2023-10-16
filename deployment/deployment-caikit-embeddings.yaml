@@ -1,30 +1,16 @@
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: caikit-embeddings
 spec:
-  strategy:
-    type: Rolling
-    rollingParams:
-      updatePeriodSeconds: 1
-      intervalSeconds: 1
-      timeoutSeconds: 600
-      maxUnavailable: 25%
-      maxSurge: 25%
-    resources: {}
-    activeDeadlineSeconds: 21600
-  triggers:
-    - type: ConfigChange
   replicas: 1
-  revisionHistoryLimit: 10
-  test: false
   selector:
-    app: caikit-embeddings
+    matchLabels:
+      deployment: caikit-embeddings
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        app: caikit-embeddings
+        deployment: caikit-embeddings
     spec:
       volumes:
         - name: cos-pvc
@@ -77,6 +63,13 @@ spec:
       imagePullSecrets:
         - name: icr-caikit-image
       schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
 ---
 kind: Secret
 apiVersion: v1
@@ -85,4 +78,51 @@ metadata:
 data:
   .dockerconfigjson: <base64 encoded dockerconfigjson>
 type: kubernetes.io/dockerconfigjson
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: caikit-embeddings-route
+  annotations:
+    openshift.io/host.generated: 'true'
+spec:
+  host: >-
+    caikit-embeddings-route-<oc-project-name>.<cluster-host>.<cluster-domain>
+  to:
+    kind: Service
+    name: caikit-embeddings-service
+    weight: 100
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  wildcardPolicy: None
+status:
+  ingress:
+    - host: >-
+        caikit-embeddings-route-<oc-project-name>.<cluster-host>.<cluster-domain>
+      routerName: default
+      conditions:
+        - type: Admitted
+          status: 'True'
+      wildcardPolicy: None
+      routerCanonicalHostname: >-
+        router-default.<cluster-host>.<cluster-domain>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: caikit-embeddings-service
+spec:
+  selector:
+    deployment: caikit-embeddings
+  ports:
+    - name: server-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: grpc-port
+      protocol: TCP
+      port: 8085
+      targetPort: 8085
 
