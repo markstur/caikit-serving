@@ -9,14 +9,13 @@ spec:
       deployment: grpcui
   template:
     metadata:
-      creationTimestamp: null
       labels:
         deployment: grpcui
     spec:
       volumes:
         - name: server-tls
           secret:
-            secretName: fmaas-caikit-trainer-tls
+            secretName: caikit-tls
             defaultMode: 256
       containers:
         - resources: {}
@@ -91,3 +90,13 @@ status:
       wildcardPolicy: None
       routerCanonicalHostname: >-
         router-default.<cluster-host>.<cluster-domain>
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: caikit-tls
+data:
+  ca.crt: <cert>
+  tls.crt: <cert>
+  tls.key: <key>
+type: Opaque
