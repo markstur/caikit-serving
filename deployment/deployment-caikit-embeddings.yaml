@@ -22,6 +22,10 @@ spec:
         - name: models-pvc
           persistentVolumeClaim:
             claimName: pvc-caikit-embeddings-models
+        - name: tls-secret
+          secret:
+            secretName: tls-secret
+            defaultMode: 420
       containers:
         - resources:
             limits:
@@ -33,7 +37,8 @@ spec:
             - '-c'
             - >-
               cd deployment/assets/ && python create-script.py && cd ../../ &&
-              sh load-models-config.sh
+              sh load-models-config.sh && cd demo/server && python
+              start_runtime.py
           env:
             - name: TRANSFORMERS_CACHE
               value: /opt/app-root/src/.cache/huggingface/hub/
@@ -54,6 +59,8 @@ spec:
               subPath: transformers_cache/
             - name: models-pvc
               mountPath: /opt/app-root/src/demo/models/
+            - name: tls-secret
+              mountPath: /mnt
           terminationMessagePolicy: File
           image: 'icr.io/fm-stack/caikit-embeddings:latest'
       restartPolicy: Always
@@ -95,19 +102,7 @@ spec:
   port:
     targetPort: 8080
   tls:
-    termination: edge
-  wildcardPolicy: None
-status:
-  ingress:
-    - host: >-
-        caikit-embeddings-route-<oc-project-name>.<cluster-host>.<cluster-domain>
-      routerName: default
-      conditions:
-        - type: Admitted
-          status: 'True'
-      wildcardPolicy: None
-      routerCanonicalHostname: >-
-        router-default.<cluster-host>.<cluster-domain>
+    termination: passthrough
 ---
 apiVersion: v1
 kind: Service

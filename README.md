@@ -2,20 +2,6 @@
 
 Caikit service for embeddings.
 
-## Example models
-
-This repo includes a `models` directory which configures 2 model instances for testing.
-
-| Model ID | Use case                               |
-|----------|----------------------------------------|
-| mini       | Example for embedding retrieval module |
-| mini-rr    | Example for reranker module            |
-| mini-ss    | Example for sentence similarity module |
-
-## Try it out
-
-The repository contains an example configuration to use the sentence-transformers/all-MiniLM-L6-v2 model from huggingface. The model will be downloaded and cached locally.
-
 ### Before Starting
 
 The following tools are required:
@@ -24,6 +10,18 @@ The following tools are required:
 - [pip](https://pypi.org/project/pip/) (v23.0+)
 
 **Note:** Before installing dependencies and to avoid conflicts in your environment, it is advisable to use a virtual environment. The subsection which follows provides an example of a virtual environment, Python venv.
+
+### Models
+
+To populate the `models` folder at [demo/models](./demo), for local test, you need either create the folders' structure with the models' ID as name as seen in the table bellow. Or you can download the folders containing `config.yml` files with the caikit block ID from the COS used to onboard the models.
+
+| Model ID | Use case                               |
+|----------|----------------------------------------|
+| mini       | Example for embedding retrieval module |
+| mini-rr    | Example for reranker module            |
+| mini-ss    | Example for sentence similarity module |
+
+> Check [Onboarding Models Documentation](./deployment/README.md#onboarding-models) at the deployment instructions to read more about how the models are loaded at deploy time.
 
 #### Setting Up Virtual Environment using Python venv
 

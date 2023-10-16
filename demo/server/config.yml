@@ -21,8 +21,11 @@ runtime:
     http: {"enabled": True}
     # All models in this directory are loaded at boot time
     local_models_dir: "../models"
-
+    tls:
+        server:
+            key: /mnt/tls.key
+            cert: /mnt/tls.crt
     # Training configuration
     training:
         # The directory to save trained models in
-        output_dir: "../train_output"
+        output_dir: "../train_output2"
