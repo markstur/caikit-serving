@@ -1,0 +1,18 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: embeddings-grpc
+  labels:
+    app: caikit-embeddings
+  annotations:
+    haproxy.router.openshift.io/timeout: 2700s
+spec:
+  host: caikit-embeddings-<oc-project-name>.<cluster-host>.<cluster-domain>
+  to:
+    kind: Service
+    name: caikit-embeddings-service
+    weight: 100
+  port:
+    targetPort: grpc-port
+  tls:
+    termination: passthrough
