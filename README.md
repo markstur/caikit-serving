@@ -1,6 +1,16 @@
-# Caikit Embeddings
+# Caikit Text Embedding
 
 Caikit service for embeddings.
+
+| Task                    | Module(s)                                      | Salient Feature(s)                                                                                                                                                         |
+|-------------------------|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EmbeddingTask           | `TextEmbedding`                             | text/embedding from a local sentence-transformers model                                                                                                                 
+| EmbeddingTasks          | `TextEmbedding`                             | Same as EmbeddingTask but multiple sentences (texts) as input and corresponding list of outputs.                                                                        
+| SentenceSimilarityTask  | `TextEmbedding`                             | text/sentence-similarity from a local sentence-transformers model (Hugging Face style API returns scores only in order of input sentences)                              |
+| SentenceSimilarityTasks | `TextEmbedding`                             | Same as SentenceSimilarityTask but multiple source_sentences (each to be compared to same list of sentences) as input and corresponding lists of outputs.               |
+| RerankTask              | `TextEmbedding`                             | text/rerank from a local sentence-transformers model (Cohere style API returns top_n scores in order of relevance with index to source and optionally returning inputs) |
+| RerankTasks             | `TextEmbedding`                             | Same as RerankTask but multiple queries as input and corresponding lists of outputs. Same list of documents for all queries.                                            |
+
 
 ### Before Starting
 

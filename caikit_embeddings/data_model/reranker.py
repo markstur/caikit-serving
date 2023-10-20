@@ -12,41 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Standard
+from typing import List, Optional
+
+# First Party
+from caikit.core import DataObjectBase, dataobject
 from caikit.core.data_model.json_dict import JsonDict
-from caikit.core import (
-    dataobject,
-    DataObjectBase,
-)
-
-from typing import List, Dict
-
-
-@dataobject()
-class RerankDocument(DataObjectBase):
-    """An input document with key of text else _text else empty string used for comparison"""
-    document: Dict[str, str]  # TODO: get any JsonDict working for input
-
-@dataobject()
-class RerankDocuments(DataObjectBase):
-    """An input list of documents"""
-    documents: List[RerankDocument]
 
 
 @dataobject()
 class RerankScore(DataObjectBase):
     """The score for one document (one query)"""
-    document: JsonDict
-    corpus_id: int
+
+    document: Optional[JsonDict]
+    index: int
     score: float
+    text: Optional[str]
 
 
 @dataobject()
 class RerankQueryResult(DataObjectBase):
     """Result for one query in a rerank task"""
+
+    query: Optional[str]
     scores: List[RerankScore]
 
 
 @dataobject()
 class RerankPrediction(DataObjectBase):
     """Result for a rerank task"""
+
     results: List[RerankQueryResult]

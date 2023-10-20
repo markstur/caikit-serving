@@ -12,5 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Text Embedding Module
+=====================
+
+Implements the following tasks:
+
+  1. EmbeddingTask: Returns an embedding from an input text string
+  2. EmbeddingsTasks: EmbeddingTask but with a list of inputs producing a list of outputs
+  3. SentenceSimilarityTask: Compare one source sentence to a list of sentences
+  4. SentenceSimilarityTasks: SentenceSimilarityTask but with a list of source sentences producing
+     a list of outputs
+  5. RerankTask: Return top_n documents ordered by relevance given a query
+  6. RerankTasks: RerankTask but with a list of queries producing a list of outputs
+
+"""
+
 # Local
-from .embedding_retrieval_task import EmbeddingRetrievalTask
+from .embedding import TextEmbedding
+from .embedding_retrieval_task import EmbeddingTask, EmbeddingTasks
+from .rerank_task import RerankTask, RerankTasks
+from .sentence_similarity_task import SentenceSimilarityTask, SentenceSimilarityTasks
