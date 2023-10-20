@@ -26,11 +26,7 @@ from caikit.config.config import get_config
 from caikit.runtime.service_factory import ServicePackageFactory
 import caikit
 
-from google.protobuf.descriptor_pool import DescriptorPool
-from google.protobuf.message_factory import MessageFactory
-from grpc_reflection. v1alpha.proto_reflection_descriptor_database import (
-    ProtoReflectionDescriptorDatabase,
-)
+from google.protobuf.struct_pb2 import Struct
 
 if __name__ == "__main__":
     # Add the runtime/library to the path
@@ -48,22 +44,23 @@ if __name__ == "__main__":
         ServicePackageFactory.ServiceType.INFERENCE,
     )
 
-    model_id = "mini-rr"
+    model_id = getenv("MODEL", "mini")
 
-    top_n = 2
+    top_n = 3
     queries = ["first sentence", "any sentence"]
     documents = [
-        {"document": {
+        {
             "text": "first sentence",
             "title": "first title"
-        }},
-        {"document": {
+        },
+        {
             "_text": "another sentence",
             "more": "more attributes here"
-        }},
-        {"document": {
-            "nothing": "",
-        }},
+        },
+        {
+            "text": "a doc with a nested metadata",
+            "meta": {"foo": "bar", "i": 999, "f": 12.34}
+        },
     ]
 
     print("======================")
@@ -79,54 +76,56 @@ if __name__ == "__main__":
         host = getenv('CAIKIT_EMBEDDINGS_HOST') if getenv('CAIKIT_EMBEDDINGS_HOST') else 'localhost'
         channel = grpc.insecure_channel(f"{host}:{port}")
         client_stub = inference_service.stub_class(channel)
-        reflection_db = ProtoReflectionDescriptorDatabase(channel)
-        desc_pool = DescriptorPool(reflection_db)
-        services = [
-            x for x in reflection_db.get_services() if
-            x.startswith("caikit.runtime.") and not x.endswith("TrainingService") and not x.endswith(
-                "TrainingManagement")
-        ]
-        if len(services) != 1:
-            print(f"Error: Expected 1 caikit.runtime service, but found {len(services)}.")
-        service_name = services[0]
-        service_prefix, _, _ = service_name.rpartition(".")
-        request_name = f"{service_prefix}.RerankTaskRequest"
-        request_desc = desc_pool.FindMessageTypeByName(request_name)
-        rerank_docs = MessageFactory(desc_pool).GetPrototype(
-            desc_pool.FindMessageTypeByName("caikit_data_model.RerankDocuments"))
-        rerank_request = MessageFactory(desc_pool).GetPrototype(request_desc)
 
-        # gRPC documents
-        docs = rerank_docs(documents=documents)
+        # gRPC JSON documents go in Structs
+        docs = []
+        for d in documents:
+            s = Struct()
+            s.update(d)
+            docs.append(s)
 
-        # gRPC request
-        request = rerank_request(queries=queries, documents=docs, top_n=2)
-        response = client_stub.RerankTaskPredict(
+        request = inference_service.messages.RerankTasksRequest(
+            queries=queries, documents=docs, top_n=top_n)
+        response = client_stub.RerankTasksPredict(
             request, metadata=[("mm-model-id", model_id)], timeout=1)
+
+        # print("RESPONSE:", response)
 
         # gRPC response
         print("RESPONSE from gRPC:")
         for i, r in enumerate(response.results):
             print("===")
-            print("QUERY: ", queries[i])
-            # print("RESULTS: ", r)
+            print("QUERY: ", r.query)
             for s in r.scores:
-                print(f"  score: {s.score}  corpus_id: {s.corpus_id}")
-                for f in s.document.items():
-                    print(f"             {f[0]}: {f[1]}")
+                print(f"  score: {s.score}  index: {s.index}  text: {s.text}")
 
     if get_config().runtime.http.enabled:
         # REST payload
         payload = {"queries": queries, "documents": {"documents": documents}}
         payload = {
+            "model_id": model_id,
             "inputs": {
                 "documents": {"documents": documents},
                 "queries": queries,
-                "top_n": 2
+                "top_n": 2,
             }
         }
+
+        payload = {
+            "inputs": {
+                "documents": documents,
+                "queries": queries,
+            },
+            "parameters": {
+                "top_n": -1,
+                "return_documents": True,
+                "return_queries": True,
+                "return_text": True
+            },
+            "model_id": "slate-er"
+        }
         response = requests.post(
-            f"http://{host}:8080/api/v1/{model_id}/task/rerank",
+            f"http://{host}:8080/api/v1/task/rerank-tasks",
             json=payload,
             timeout=1,
         )
