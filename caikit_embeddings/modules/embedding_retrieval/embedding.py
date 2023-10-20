@@ -35,7 +35,7 @@ import alog
 from .embedding_retrieval_task import EmbeddingTask, EmbeddingTasks
 from .rerank_task import RerankTask, RerankTasks
 from .sentence_similarity_task import SentenceSimilarityTask, SentenceSimilarityTasks
-from caikit_nlp.data_model import (
+from caikit_embeddings.data_model import (
     ListOfVector1D,
     RerankPrediction,
     RerankQueryResult,
