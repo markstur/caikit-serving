@@ -39,9 +39,9 @@ spec:
             - name: HUGGINGFACE_HUB_CACHE
               value: $(TRANSFORMERS_CACHE)
             - name: MODELS_DIR
-              value: '["sentence-transformers_all-MiniLM-L6-v2","slate.rtvr271M"]'
+              value: '["sentence-transformers_all-MiniLM-L6-v2"]'
             - name: MODELS_LIST
-              value: '["mini", "slate"]'
+              value: '["mini"]'
           ports:
             - containerPort: 8080
               protocol: TCP
