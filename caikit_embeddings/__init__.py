@@ -11,15 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Caikit text embedding library
+"""
 # Standard
 import os
 
-# Local
 import caikit
 
-from . import data_model, modules
+# Local
+# Import subpackages
+from .config import *
+from .data_model import *
+from .modules import *
 
-# Give the path to the `config.yml`
-CONFIG_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), "config", "config.yml"))
+# Configure the library with library-specific configuration file
+CONFIG_PATH = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), "config", "config.yml")
+)
+
 caikit.configure(CONFIG_PATH)

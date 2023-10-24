@@ -12,16 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Standard
+from typing import List
+
 # First Party
 from caikit.core import TaskBase, task
-from caikit.interfaces.common.data_model.primitive_sequences import FloatSequence
 
-from typing import List
+# Local
+from ...data_model import SentenceListScores, SentenceScores
 
 
 @task(
     required_parameters={"source_sentence": str, "sentences": List[str]},
-    output_type=FloatSequence
+    output_type=SentenceScores,
 )
 class SentenceSimilarityTask(TaskBase):
-    pass
+    """Compare the source_sentence to each of the sentences.
+    Result contains a list of scores in the order of the input sentences.
+    """
+
+
+@task(
+    required_parameters={"source_sentences": List[str], "sentences": List[str]},
+    output_type=SentenceListScores,
+)
+class SentenceSimilarityTasks(TaskBase):
+    """Compare each of the source_sentences to each of the sentences.
+    Returns a list of results in the order of the source_sentences.
+    Each result contains a list of scores in the order of the input sentences.
+    """

@@ -35,7 +35,7 @@ caikit.configure(CONFIG_PATH)
 
 # NOTE: The model id needs to be a path to folder.
 # NOTE: This is relative path to the models directory
-MODEL_ID = "mini"
+MODEL_ID = os.getenv("MODEL", "mini")
 
 inference_service = ServicePackageFactory().get_service_package(
     ServicePackageFactory.ServiceType.INFERENCE,
@@ -48,18 +48,19 @@ client_stub = inference_service.stub_class(channel)
 
 # Create request object
 
-sentences = ["test first sentence", "another test sentence"]
-request = inference_service.messages.EmbeddingRetrievalTaskRequest(input=sentences)
+texts = ["test first sentence", "another test sentence"]
+request = inference_service.messages.EmbeddingTasksRequest(texts=texts)
 
 # Fetch predictions from server (infer)
-response = client_stub.EmbeddingRetrievalTaskPredict(
+response = client_stub.EmbeddingTasksPredict(
     request, metadata=[("mm-model-id", MODEL_ID)]
 )
 
 # Print response
-print("INPUTS: ", sentences)
+print("INPUTS TEXTS: ", texts)
 print("RESULTS: [")
-for d in response.data:
-    print("  ", d.data)
+for d in response.results:
+    woo = d.WhichOneof("data")  # which one of data_<float_type>s did we get?
+    print(getattr(d, woo).values)
 print("]")
-print("LENGTH: ", len(response.data), " x ", len(response.data[0].data))
+print("LENGTH: ", len(response.results), " x ", len(getattr(response.results[0], woo).values))

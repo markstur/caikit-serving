@@ -1,6 +1,16 @@
-# Caikit Embeddings
+# Caikit Text Embedding
 
 Caikit service for embeddings.
+
+| Task                    | Module(s)                                      | Salient Feature(s)                                                                                                                                                         |
+|-------------------------|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EmbeddingTask           | `TextEmbedding`                             | text/embedding from a local sentence-transformers model                                                                                                                 
+| EmbeddingTasks          | `TextEmbedding`                             | Same as EmbeddingTask but multiple sentences (texts) as input and corresponding list of outputs.                                                                        
+| SentenceSimilarityTask  | `TextEmbedding`                             | text/sentence-similarity from a local sentence-transformers model (Hugging Face style API returns scores only in order of input sentences)                              |
+| SentenceSimilarityTasks | `TextEmbedding`                             | Same as SentenceSimilarityTask but multiple source_sentences (each to be compared to same list of sentences) as input and corresponding lists of outputs.               |
+| RerankTask              | `TextEmbedding`                             | text/rerank from a local sentence-transformers model (Cohere style API returns top_n scores in order of relevance with index to source and optionally returning inputs) |
+| RerankTasks             | `TextEmbedding`                             | Same as RerankTask but multiple queries as input and corresponding lists of outputs. Same list of documents for all queries.                                            |
+
 
 ### Before Starting
 
@@ -45,23 +55,23 @@ cd demo/server
 python start_runtime.py
 ```
 
-### Embedding retrieval client
+### Embedding retrieval example Python client
 
-In another terminal, run the client code to retrieve embeddings.
+In another terminal, run the example client code to retrieve embeddings.
 
 ```shell
 source venv/bin/activate
 cd demo/client
-python embeddings.py
+MODEL=<model-id> python embeddings.py
 ```
 
-The client code calls the model and queries for embeddings using 2 example sentences (hardcoded in infer_model.py).
+The client code calls the model and queries for embeddings using 2 example sentences.
 
 You should see output similar to the following:
 
 ```ShellSession
 $ python embeddings.py
-INPUTS:  ['test first sentence', 'another test sentence']
+INPUT TEXTS:  ['test first sentence', 'another test sentence']
 RESULTS: [
    [0.02021969109773636, 0.07058270275592804, 0.008317082189023495, ...]
    [0.04209445044398308, 0.07522737234830856, 0.018512120470404625, ...]
@@ -69,14 +79,14 @@ RESULTS: [
 LENGTH:  2  x  384
 ```
 
-### Sentence similarity client
+### Sentence similarity example Python client
 
 In another terminal, run the client code to infer sentence similarity.
 
 ```shell
 source venv/bin/activate
 cd demo/client
-python sentence_similarity.py
+MODEL=<model-id> python sentence_similarity.py
 ```
 
 The client code calls the model and queries sentence similarity using 1 source sentence and 2 other sentences (hardcoded in sentence_similarity.py). The result produces the cosine similarity score by comparing the source sentence with each of the other sentences.
@@ -90,14 +100,14 @@ SENTENCES:  ['test first sentence', 'another test sentence']
 RESULTS:  [0.6898421049118042, 0.5583217144012451]
 ```
 
-### Reranker client
+### Reranker example Python client
 
 In another terminal, run the client code to execute the reranker task using both gRPC and REST.
 
 ```shell
 source venv/bin/activate
 cd demo/client
-python reranker.py
+MODEL=<model-id> python reranker.py
 ```
 
 You should see output similar to the following:
@@ -105,68 +115,94 @@ You should see output similar to the following:
 ```ShellSession
 $ python reranker.py
 ======================
-TOP K:  2
+TOP N:  3
 QUERIES:  ['first sentence', 'any sentence']
-DOCUMENTS:  [{'document': {'text': 'first sentence', 'title': 'first title'}}, {'document': {'_text': 'another sentence', 'more': 'more attributes here'}}, {'document': {'nothing': ''}}]
+DOCUMENTS:  [{'text': 'first sentence', 'title': 'first title'}, {'_text': 'another sentence', 'more': 'more attributes here'}, {'text': 'a doc with a nested metadata', 'meta': {'foo': 'bar', 'i': 999, 'f': 12.34}}]
 ======================
 RESPONSE from gRPC:
 ===
 QUERY:  first sentence
-  score: 1.0  corpus_id: 0
-             text: first sentence
-             title: first title
-  score: 0.7350106835365295  corpus_id: 1
-             _text: another sentence
-             more: more attributes here
+  score: 1.0000001192092896  index: 0  text: first sentence
+  score: 0.6204259991645813  index: 1  text: another sentence
+  score: 0.11101679503917694  index: 2  text: a doc with a nested metadata
 ===
 QUERY:  any sentence
-  score: 0.6631793975830078  corpus_id: 0
-             text: first sentence
-             title: first title
-  score: 0.650596022605896  corpus_id: 1
-             _text: another sentence
-             more: more attributes here
+  score: 0.5091423988342285  index: 1  text: another sentence
+  score: 0.42496341466903687  index: 0  text: first sentence
+  score: 0.0962495356798172  index: 2  text: a doc with a nested metadata
 ===================
 RESPONSE from HTTP:
 {
     "results": [
         {
+            "query": "first sentence",
             "scores": [
                 {
                     "document": {
                         "text": "first sentence",
                         "title": "first title"
                     },
-                    "corpus_id": 0,
-                    "score": 1.0
+                    "index": 0,
+                    "score": 1.0000001192092896,
+                    "text": "first sentence"
                 },
                 {
                     "document": {
                         "_text": "another sentence",
                         "more": "more attributes here"
                     },
-                    "corpus_id": 1,
-                    "score": 0.7350106835365295
+                    "index": 1,
+                    "score": 0.6204259991645813,
+                    "text": "another sentence"
+                },
+                {
+                    "document": {
+                        "text": "a doc with a nested metadata",
+                        "meta": {
+                            "foo": "bar",
+                            "i": 999,
+                            "f": 12.34
+                        }
+                    },
+                    "index": 2,
+                    "score": 0.11101679503917694,
+                    "text": "a doc with a nested metadata"
                 }
             ]
         },
         {
+            "query": "any sentence",
             "scores": [
-                {
-                    "document": {
-                        "text": "first sentence",
-                        "title": "first title"
-                    },
-                    "corpus_id": 0,
-                    "score": 0.6631793975830078
-                },
                 {
                     "document": {
                         "_text": "another sentence",
                         "more": "more attributes here"
                     },
-                    "corpus_id": 1,
-                    "score": 0.650596022605896
+                    "index": 1,
+                    "score": 0.5091423988342285,
+                    "text": "another sentence"
+                },
+                {
+                    "document": {
+                        "text": "first sentence",
+                        "title": "first title"
+                    },
+                    "index": 0,
+                    "score": 0.42496341466903687,
+                    "text": "first sentence"
+                },
+                {
+                    "document": {
+                        "text": "a doc with a nested metadata",
+                        "meta": {
+                            "foo": "bar",
+                            "i": 999,
+                            "f": 12.34
+                        }
+                    },
+                    "index": 2,
+                    "score": 0.0962495356798172,
+                    "text": "a doc with a nested metadata"
                 }
             ]
         }

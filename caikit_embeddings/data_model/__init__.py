@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Common data model containing all data structures that are passed in and out of blocks.
+"""
 
+# Local
 from .embedding_vectors import *
 from .reranker import *
+from .sentence_similarity import *

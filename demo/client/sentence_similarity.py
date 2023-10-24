@@ -35,7 +35,7 @@ caikit.configure(CONFIG_PATH)
 
 # NOTE: The model id needs to be a path to folder.
 # NOTE: This is relative path to the models directory
-MODEL_ID = "mini-ss"
+MODEL_ID = os.getenv("MODEL", "mini")
 
 inference_service = ServicePackageFactory().get_service_package(
     ServicePackageFactory.ServiceType.INFERENCE,
@@ -60,4 +60,4 @@ response = client_stub.SentenceSimilarityTaskPredict(
 # Print response
 print("SOURCE SENTENCE: ", source_sentence)
 print("SENTENCES: ", sentences)
-print("RESULTS: ", [v for v in response.values])
+print("RESULTS: ", [v for v in response.scores])

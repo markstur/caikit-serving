@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from caikit_embeddings.modules.embedding_retrieval.embedding import EmbeddingModule
-from caikit_embeddings.modules.sentence_similarity.sentence_similarity import SentenceSimilarity
-from caikit_embeddings.modules.reranker.rerank import Rerank
-from .hf_base import HFBase
+# Local
+from . import (
+    embedding_retrieval,
+)
