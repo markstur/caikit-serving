@@ -250,3 +250,19 @@ After you hit `Invoke`, it will show the response like this:
 ![grpc_response](doc/images/grpc_response.png)
 
 Use the **Request Form** or **History** tab to try another request or retry a recent one.
+
+### Using Caikit to dump interfaces
+
+If you need proto files, you can ask a properly configured caikit runtime to dump them to a directory.  This will also save the openapi.json for HTTP/REST.
+
+In a terminal, use your virtual environment and run `dump_apis.sh`:
+
+> Note: This will start and stop the server, so make sure you don't have one already running.
+
+```shell
+source venv/bin/activate
+cd demo/client
+./dump_apis.sh
+```
+
+This will create a directory named `generated_interfaces` under `demo/client` containing all the proto files (and the openapi.json file).
