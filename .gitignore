@@ -167,5 +167,7 @@ cython_debug/
 
 # Caikit generated files
 tests/protos/*
+demo/client/generated_interfaces
+demo/models/
 demo/train_output/
 
