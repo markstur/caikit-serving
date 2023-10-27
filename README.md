@@ -25,12 +25,6 @@ The following tools are required:
 
 To populate the `models` folder at [demo/models](./demo), for local test, you need either create the folders' structure with the models' ID as name as seen in the table bellow. Or you can download the folders containing `config.yml` files with the caikit block ID from the COS used to onboard the models.
 
-| Model ID | Use case                               |
-|----------|----------------------------------------|
-| mini       | Example for embedding retrieval module |
-| mini-rr    | Example for reranker module            |
-| mini-ss    | Example for sentence similarity module |
-
 > Check [Onboarding Models Documentation](./deployment/README.md#onboarding-models) at the deployment instructions to read more about how the models are loaded at deploy time.
 
 #### Setting Up Virtual Environment using Python venv
