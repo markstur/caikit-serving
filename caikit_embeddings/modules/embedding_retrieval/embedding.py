@@ -14,7 +14,9 @@
 
 # Standard
 from typing import List, Optional
+import importlib
 import os
+from os import getenv
 
 # Third Party
 from sentence_transformers import SentenceTransformer
@@ -24,6 +26,8 @@ from sentence_transformers.util import (
     normalize_embeddings,
     semantic_search,
 )
+from torch import compile, cuda, device, inference_mode
+from torch.backends import mps
 
 # First Party
 from caikit.core import ModuleBase, ModuleConfig, ModuleSaver, module
@@ -47,6 +51,33 @@ from caikit_embeddings.data_model import (
 
 logger = alog.use_channel("<EMBD_BLK>")
 error = error_handler.get(logger)
+
+# For testing env vars
+FALSY = ("no", "n", "false", "0", "f", "off")
+
+# When IPEX_OPTIMIZE is not false, attempt to import the library and use it.
+IPEX_OPTIMIZE = getenv("IPEX_OPTIMIZE", "false").lower() not in FALSY
+if IPEX_OPTIMIZE:
+    try:
+        ipex = importlib.import_module("intel_extension_for_pytorch")
+    except Exception as ie:
+        # We don't require the module so catch, disable, log, proceed.
+        IPEX_OPTIMIZE = False
+        logger.warn("IPEX_OPTIMIZE enabled in env, but skipping ipex.optimize() because "
+                    f"import intel_extension_for_pytorch failed with exception: {ie}",
+                    exc_info=1)
+if IPEX_OPTIMIZE:
+    # Optionally use "xpu" (IPEX on GPU instead of IPEX on CPU)
+    USE_XPU = getenv("USE_XPU", "false").lower() not in FALSY
+    USE_MPS = False  # Don't use "mps" with IPEX.
+else:
+    USE_XPU = False  # We don't USE_XPU when we don't IPEX_OPTIMIZE
+    # Otherwise when USE_MPS is not false, use device "mps" if it is available
+    USE_MPS = getenv(
+        "USE_MPS", "false").lower() not in FALSY and mps.is_built() and mps.is_available()
+
+# torch.compile won't work everywhere, but when set to try we'll try it
+PT2_COMPILE = os.getenv("PT2_COMPILE", "false").lower() not in FALSY
 
 
 @module(
@@ -73,6 +104,7 @@ class TextEmbedding(ModuleBase):
     ):
         super().__init__()
         self.model = model
+        self.model.eval()
 
     @classmethod
     def load(cls, model_path: str, *args, **kwargs) -> "TextEmbedding":
@@ -80,7 +112,8 @@ class TextEmbedding(ModuleBase):
 
         Args:
             model_path: str
-                Path to the config dir under the model_id (where the config.yml lives)
+                Path to the ModuleConfig or config dir under the model_id
+                (where the config.yml lives)
 
         Returns:
             EmbeddingModule
@@ -96,10 +129,42 @@ class TextEmbedding(ModuleBase):
             ValueError(f"Model config missing '{cls._ARTIFACTS_PATH_KEY}'"),
         )
 
-        artifacts_path = os.path.abspath(os.path.join(model_path, artifacts_path))
+        artifacts_path = os.path.join(config.model_path, artifacts_path)
         error.dir_check("<NLP34197772E>", artifacts_path)
 
-        return cls.bootstrap(model_name_or_path=artifacts_path)
+        gpu = "xpu" if USE_XPU else "mps" if USE_MPS else "cuda" if cuda.is_available() else None
+        model = SentenceTransformer(model_name_or_path=artifacts_path, device=gpu)
+        if gpu is not None:
+            model.to(device(gpu))
+        model = cls._optimize(model)
+        wrapped_model = cls(model)
+        with inference_mode():
+            for _ in range(10):
+                _ = wrapped_model.run_embedding(
+                    "This is a warmup string just to get the model ready.")
+                _ = wrapped_model.run_embeddings([
+                    "Just another warmup.",
+                    "A couple different texts. Not sure what works best here."
+                ])
+        return wrapped_model
+
+    @staticmethod
+    def _optimize(model):
+        if IPEX_OPTIMIZE:
+            model = ipex.optimize(model)
+            backend = "ipex"
+        elif USE_MPS:
+            backend = mps
+        else:
+            backend = "inductor"  # default backend
+        if PT2_COMPILE:
+            try:
+                model = compile(model, backend=backend, mode="max-autotune")
+            except Exception as e:
+                # Not always supported (e.g. in a python version) so catch, log, proceed.
+                logger.warn("PT2_COMPILE enabled in env, but continuing without torch.compile() "
+                            f"because it failed with exception: {e}", exc_info=True)
+        return model
 
     @EmbeddingTask.taskmethod()
     def run_embedding(self, text: str) -> Vector1D:  # pylint: disable=redefined-builtin
