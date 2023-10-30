@@ -21,12 +21,6 @@ The following tools are required:
 
 **Note:** Before installing dependencies and to avoid conflicts in your environment, it is advisable to use a virtual environment. The subsection which follows provides an example of a virtual environment, Python venv.
 
-### Models
-
-To populate the `models` folder at [demo/models](./demo), for local test, you need either create the folders' structure with the models' ID as name as seen in the table bellow. Or you can download the folders containing `config.yml` files with the caikit block ID from the COS used to onboard the models.
-
-> Check [Onboarding Models Documentation](./deployment/README.md#onboarding-models) at the deployment instructions to read more about how the models are loaded at deploy time.
-
 #### Setting Up Virtual Environment using Python venv
 
 For [(venv)](https://docs.python.org/3/library/venv.html), make sure you are in an activated `venv` when running `python` in the example commands that follow. Use `deactivate` if you want to exit the `venv`.
@@ -38,6 +32,29 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+### Models
+
+To create a model configuration and artifacts, the best practice is to run the module's bootstrap() and save() methods.  This will:
+
+* Load the model by name (from Hugging Face hub or repository) or from a local directory. The model is loaded using the sentence-transformers library.
+* Save a config.yml which:
+  * Ties the model to the module (with a module_id GUID)
+  * Sets the artifacts_path to the default "artifacts" subdirectory
+  * Saves the model in the artifacts subdirectory
+
+This can be done by running the `boostrap_model.py` script in your virtual environment.
+
+```shell
+source venv/bin/activate
+cd demo/server
+./bootstrap_model.py -m <MODEL_NAME_OR_PATH> -o <OUTPUT_DIR>
+```
+
+To avoid overwriting your files, the save() will return an error if the output directory already exists. You may want to use a temporary name. After success, move the output directory to a `<model-id>` directory under your local models dir.
+
+> You can use the same process for cluster deployment, by copying the output directory to your cluster storage.
+> Check [Onboarding Models Documentation](./deployment/README.md#onboarding-models) in the deployment instructions to read more about how the models are loaded at deploy time.
 
 ### Starting the Caikit Runtime
 
