@@ -34,25 +34,22 @@ spec:
               sh load-models-config.sh && cd demo/server && python
               start_runtime.py
           env:
-            - name: TRANSFORMERS_CACHE
-              value: /opt/app-root/src/.cache/huggingface/hub/
-            - name: HUGGINGFACE_HUB_CACHE
-              value: $(TRANSFORMERS_CACHE)
-            - name: MODELS_DIR
-              value: '["sentence-transformers_all-MiniLM-L6-v2"]'
             - name: MODELS_LIST
               value: '["mini"]'
           ports:
             - containerPort: 8080
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
           imagePullPolicy: Always
           volumeMounts:
-            - name: cos-pvc
-              mountPath: /opt/app-root/src/.cache/huggingface/sentence_transformers/
-              subPath: models/
-            - name: cos-pvc
-              mountPath: /opt/app-root/src/.cache/huggingface/hub/
-              subPath: transformers_cache/
             - name: cos-pvc
               mountPath: /opt/app-root/src/demo/models/
             - name: tls-secret
