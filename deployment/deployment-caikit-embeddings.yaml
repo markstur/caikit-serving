@@ -35,7 +35,15 @@ spec:
               start_runtime.py
           env:
             - name: MODELS_LIST
-              value: '["mini"]'
+              value: '["mini/artifacts"]'
+            - name: IPEX_OPTIMIZE
+              value: 'false'
+            - name: USE_XPU
+              value: 'false'
+            - name: USE_MPS
+              value: 'false'
+            - name: PT2_COMPILE
+              value: 'false'
           ports:
             - containerPort: 8080
               protocol: TCP
