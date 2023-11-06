@@ -69,5 +69,11 @@ Opening the route created, you should be able to see this view:
 - The `demo/models` folder is now a PVC monted, that points to a bucket named `caikit-embeddings-models-config`;
 > PVC yaml can be found at [pvc-models.yaml](pvc-models.yaml)
 - Each user of the service can upload the models they wish to use, as long as they follow the same structure as before. 
-- Then, in the [deploymentconfig-caikit-embeddings.yaml](deploymentconfig-caikit-embeddings.yaml) the environment variable `MODELS_LIST` must receive a list with the models' root folder names as in the example: `'["mini/folder-to-full-model-artifacts"]'` in the json list standard, so that the app can acknowledge the models' location before start the runtime.
-- As `mini` is the root folder with the `config.yml` file for the caikit `module_id` and the rest of the path is the name of the subfolder wich contains all of the model's artifacts.
+- Then, in the [deploymentconfig-caikit-embeddings.yaml](deploymentconfig-caikit-embeddings.yaml) the environment variable `MODELS_LIST` must receive a list with the models' root folder names as in the example: `'["sentence-transformers/all-MiniLM-L6-v2/artifacts"]'` in the json list standard, so that the app can acknowledge the models' location before start the runtime.
+- See the image bellow to check how the bucket structure convention must be:
+  
+<center>
+    <img src="./assets/dir.png">
+</center>
+
+- Under the `model-full-name` dir there must be `artifacts` to where the `MODELS_LIST` will be pointed to, and `config.yaml` file in which the key `artifacts_path` must also point to the `artifacts` folder of the model.
