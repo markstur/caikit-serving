@@ -1,8 +1,8 @@
 import os
 import json
 
-MODELS_LIST_VAR = json.dumps(os.getenv('MODELS_LIST')) if os.getenv('MODELS_LIST') else  '["mini/artifacts"]'
-MODELS_LIST = json.loads(MODELS_LIST_VAR)
+# Variable must contain the path from models dir to where the model's artifacts are located
+MODELS_LIST = json.loads(os.getenv('MODELS_LIST', ["mini"]))
 
 with open ('../../load-models-config.sh', 'w') as rsh:
     init_models_command = 'cd demo && '
