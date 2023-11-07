@@ -17,6 +17,7 @@
 # Relative paths are relative to where the config is loaded
 runtime:
     library: caikit_embeddings
+    lazy_load_local_models: true
     grpc: {"enabled": True}
     http: {"enabled": True}
     # All models in this directory are loaded at boot time
