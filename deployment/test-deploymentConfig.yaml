@@ -1,0 +1,75 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: test-caikit-embeddings
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ConfigChange
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: caikit-embeddings
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: caikit-embeddings
+    spec:
+      volumes:
+        - name: cos-pvc
+          persistentVolumeClaim:
+            claimName: caikit-embeddings-cos
+      containers:
+        - resources:
+            limits:
+              nvidia.com/gpu: '1'
+          terminationMessagePath: /dev/termination-log
+          name: container
+          command:
+            - bash
+            - '-c'
+            - cd demo/server && python start_runtime.py
+          env:
+            - name: MODELS_LIST
+              value: >-
+                ["sentence-transformers/all-MiniLM-L6-v2/artifacts",
+                "ibm/slate.rtvr271M/artifacts"]
+            - name: CAIKIT_EMBEDDINGS_HOST
+              value: <EMBEDDINGS-HOST>
+            - name: CAIKIT_EMBEDDINGS_PORT
+              value: '443'
+            - name: DATASET
+              value: /opt/app-root/src/demo/models/question-single.tsv
+            - name: INITIAL_WARMUP_CYCLES
+              value: '10'
+            - name: CONFIG_PATH
+              value: /opt/app-root/src/demo/client/config.yml
+            - name: MODEL
+              value: sentence-transformers/all-MiniLM-L6-v2
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: cos-pvc
+              mountPath: /opt/app-root/src/demo/models/
+          terminationMessagePolicy: File
+          image: 'icr.io/fm-stack/caikit-embeddings:latency-test'
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      imagePullSecrets:
+        - name: icr-caikit-image
+      schedulerName: default-scheduler

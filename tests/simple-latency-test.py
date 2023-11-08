@@ -17,14 +17,12 @@ sys.path.append(
 )
 
 # Load configuration for Caikit runtime
-CONFIG_PATH = path.realpath(
-    path.join(path.dirname(__file__), "config.yml")
-)
+CONFIG_PATH = os.getenv("CONFIG_PATH")
 caikit.configure(CONFIG_PATH)
 
 # NOTE: The model id needs to be a path to folder.
 # NOTE: This is relative path to the models directory
-MODEL_ID = os.getenv("MODEL", "mini")
+MODEL_ID = os.getenv("MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
 inference_service = ServicePackageFactory().get_service_package(
     ServicePackageFactory.ServiceType.INFERENCE,
@@ -33,10 +31,7 @@ inference_service = ServicePackageFactory().get_service_package(
 port = os.getenv('CAIKIT_EMBEDDINGS_PORT') if os.getenv('CAIKIT_EMBEDDINGS_PORT') else 443
 host = os.getenv('CAIKIT_EMBEDDINGS_HOST') if os.getenv('CAIKIT_EMBEDDINGS_HOST') else 'localhost'
 
-with open(os.getenv('CAIKIT_EMBEDDINGS_CACERT'), 'rb') as f:
-    creds = grpc.ssl_channel_credentials(f.read())
-
-channel = grpc.secure_channel(f"{host}:{port}", creds)
+channel = grpc.insecure_channel(f"{host}:{port}")
 client_stub = inference_service.stub_class(channel)
 
 # Test control parameter
