@@ -32,8 +32,7 @@ spec:
           terminationMessagePolicy: File
           image: fullstorydev/grpcui
           args:
-            - '-cacert'
-            - /tls/server/ca.cert
+            - '-plaintext'
             - 'caikit-embeddings-service:8085'
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
