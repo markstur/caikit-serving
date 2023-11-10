@@ -16,10 +16,6 @@ spec:
         - name: cos-pvc
           persistentVolumeClaim:
             claimName: pvc-caikit-embeddings-cos
-        - name: tls-secret
-          secret:
-            secretName: tls-secret
-            defaultMode: 420
       containers:
         - resources:
             limits:
@@ -29,13 +25,8 @@ spec:
           command:
             - bash
             - '-c'
-            - >-
-              cd deployment/assets/ && python create-script.py && cd ../../ &&
-              sh load-models-config.sh && cd demo/server && python
-              start_runtime.py
+            - cd demo/server && python start_runtime.py
           env:
-            - name: MODELS_LIST
-              value: '["mini/artifacts"]'
             - name: IPEX_OPTIMIZE
               value: 'false'
             - name: USE_XPU
@@ -60,8 +51,6 @@ spec:
           volumeMounts:
             - name: cos-pvc
               mountPath: /opt/app-root/src/demo/models/
-            - name: tls-secret
-              mountPath: /mnt
           terminationMessagePolicy: File
           image: 'icr.io/fm-stack/caikit-embeddings:latest'
       restartPolicy: Always
@@ -87,31 +76,14 @@ data:
   .dockerconfigjson: <base64 encoded dockerconfigjson>
 type: kubernetes.io/dockerconfigjson
 ---
-kind: Route
-apiVersion: route.openshift.io/v1
-metadata:
-  name: caikit-embeddings-route
-  annotations:
-    openshift.io/host.generated: 'true'
-spec:
-  host: >-
-    caikit-embeddings-route-<oc-project-name>.<cluster-host>.<cluster-domain>
-  to:
-    kind: Service
-    name: caikit-embeddings-service
-    weight: 100
-  port:
-    targetPort: 8080
-  tls:
-    termination: passthrough
----
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
   name: caikit-embeddings-service
 spec:
-  selector:
-    deployment: caikit-embeddings
+  clusterIP: None
+  ipFamilies:
+    - IPv4
   ports:
     - name: server-port
       protocol: TCP
@@ -121,4 +93,11 @@ spec:
       protocol: TCP
       port: 8085
       targetPort: 8085
-
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - None
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    deployment: caikit-embeddings
