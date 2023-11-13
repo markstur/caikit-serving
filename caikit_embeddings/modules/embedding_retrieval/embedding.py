@@ -137,16 +137,7 @@ class TextEmbedding(ModuleBase):
         if gpu is not None:
             model.to(device(gpu))
         model = cls._optimize(model)
-        wrapped_model = cls(model)
-        with inference_mode():
-            for _ in range(10):
-                _ = wrapped_model.run_embedding(
-                    "This is a warmup string just to get the model ready.")
-                _ = wrapped_model.run_embeddings([
-                    "Just another warmup.",
-                    "A couple different texts. Not sure what works best here."
-                ])
-        return wrapped_model
+        return cls(model)
 
     @staticmethod
     def _optimize(model):
