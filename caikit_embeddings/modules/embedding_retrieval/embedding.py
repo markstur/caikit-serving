@@ -52,6 +52,11 @@ from caikit_embeddings.data_model import (
 logger = alog.use_channel("<EMBD_BLK>")
 error = error_handler.get(logger)
 
+# Avoid a warning by explicitly setting TOKENIZERS_PARALLELISM if not already set.
+tokenizers_parallelism = "TOKENIZERS_PARALLELISM"
+if os.environ.get(tokenizers_parallelism) is None:
+    os.environ[tokenizers_parallelism] = "true"
+
 # For testing env vars
 FALSY = ("no", "n", "false", "0", "f", "off")
 
