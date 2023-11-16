@@ -157,6 +157,18 @@ class TextEmbedding(ModuleBase):
                             f"because it failed with exception: {e}", exc_info=True)
         return model
 
+    def _prevent_truncation(self, text):
+        tokenized = self.model[0].tokenizer(
+            text, return_attention_mask=False, return_token_type_ids=False)
+        tokens = len(tokenized.input_ids)
+        max_tokens = self.model.max_seq_length
+        error.value_check(
+            "<NLP08391926E>",
+            tokens <= max_tokens,
+            f"Token sequence length is longer than the specified maximum sequence length"
+            f" for this model ({tokens} > {max_tokens})."
+        )
+
     @EmbeddingTask.taskmethod()
     def run_embedding(self, text: str) -> Vector1D:  # pylint: disable=redefined-builtin
         """Get embedding for a string.
@@ -168,6 +180,7 @@ class TextEmbedding(ModuleBase):
         """
         error.type_check("<NLP27491611E>", str, text=text)
 
+        self._prevent_truncation(text)
         return Vector1D.from_embeddings(self.model.encode(text))
 
     @EmbeddingTasks.taskmethod()
@@ -187,6 +200,9 @@ class TextEmbedding(ModuleBase):
         ):  # encode allows str, but the result would lack a dimension
             texts = [texts]
 
+        for text in texts:
+            self._prevent_truncation(text)
+
         embeddings = self.model.encode(texts)
         results = [Vector1D.from_embeddings(e) for e in embeddings]
         return ListOfVector1D(results=results)
@@ -203,6 +219,10 @@ class TextEmbedding(ModuleBase):
         Returns:
             SentenceScores
         """
+
+        self._prevent_truncation(source_sentence)
+        for s in sentences:
+            self._prevent_truncation(s)
 
         source_embedding = self.model.encode(source_sentence)
         embeddings = self.model.encode(sentences)
@@ -223,6 +243,11 @@ class TextEmbedding(ModuleBase):
             SentenceListScores Similarity scores for each source sentence in order.
                 each SentenceScores contains the source-sentence's score for each sentence in order.
         """
+
+        for s in source_sentences:
+            self._prevent_truncation(s)
+        for s in sentences:
+            self._prevent_truncation(s)
 
         source_embedding = self.model.encode(source_sentences)
         embeddings = self.model.encode(sentences)
@@ -313,6 +338,11 @@ class TextEmbedding(ModuleBase):
             return srd.get("text") or srd.get("_text", "")
 
         doc_texts = [get_text(srd) for srd in documents]
+
+        for text in doc_texts:
+            self._prevent_truncation(text)
+        for query in queries:
+            self._prevent_truncation(query)
 
         doc_embeddings = self.model.encode(doc_texts, convert_to_tensor=True)
         doc_embeddings = doc_embeddings.to(self.model.device)
