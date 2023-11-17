@@ -1,3 +1,2 @@
-caikit[runtime-grpc,runtime-http]>=0.24.3,<0.25.0
-sentence-transformers~=2.2.2
-transformers[torch]~=4.32.0
+caikit[runtime-grpc,runtime-http]@file:///users/markstur/gh/caikit
+caikit-nlp[sentence-transformers]@file:///users/markstur/caikit-nlp

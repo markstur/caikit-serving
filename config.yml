@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Caikit configuration
+# Caikit model configuration
+# Relative paths are relative to where the config is loaded
 runtime:
-    library: caikit_embeddings
+    library: caikit_nlp
+    lazy_load_local_models: true
+    local_models_dir: "demo/models"
+    grpc: {"enabled": True}
+    http: {"enabled": True}

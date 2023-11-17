@@ -23,15 +23,15 @@ import alog
 import caikit
 
 # Add the runtime/library to the path
-sys.path.append(
-    path.abspath(path.join(path.dirname(__file__), "../../"))
-)
-
+# sys.path.append(
+    # path.abspath(path.join(path.dirname(__file__), "../../"))
+# )
+# 
 # Load configuration for model(s) serving
-CONFIG_PATH = path.realpath(
-    path.join(path.dirname(__file__), "config.yml")
-)
-caikit.configure(CONFIG_PATH)
+# CONFIG_PATH = path.realpath(
+    # path.join(path.dirname(__file__), "config.yml")
+# )
+# caikit.configure(CONFIG_PATH)
 
 alog.configure(default_level="debug")
 
@@ -55,7 +55,7 @@ def main() -> int:
     print("MODEL NAME OR PATH: ", model_name_or_path)
     print("OUTPUT PATH:        ", output_path)
 
-    from caikit_embeddings.modules.embedding_retrieval import TextEmbedding as module
+    from caikit_nlp.modules.text_embedding import EmbeddingModule as module
     module.bootstrap(model_name_or_path).save(output_path)
 
 

@@ -1,5 +1,29 @@
 # Caikit Text Embedding
 
+---
+
+## NEW!
+
+Run caikit-runtime configured to use the caikit-nlp library.
+
+```bash
+pip install -r requirements.txt
+CONFIG_FILES=config.yml caikit-runtime
+```
+
+> NOTE!!!
+> The GUID is now lower-case!
+
+## BOOTSTRAP!!!
+
+```
+(venv39) markstur@Marks-MacBook-Pro-3 caikit-serving % ./demo/server/bootstrap_model.py -m sentence-transformers/all-MiniLM-L6-v2 -o demo/models/mini
+```
+
+
+---
+
+
 Caikit service for embeddings.
 
 | Task                    | Module(s)                                      | Salient Feature(s)                                                                                                                                                         |
