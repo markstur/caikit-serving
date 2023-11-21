@@ -1,0 +1,24 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-caikit-embeddings-cos
+  annotations:
+    ibm.io/cos-service: ''
+    ibm.io/endpoint: 'https://s3.direct.us-south.cloud-object-storage.appdomain.cloud'
+    volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
+    ibm.io/auto-create-bucket: 'false'
+    pv.kubernetes.io/provisioned-by: ibm.io/ibmc-s3fs
+    ibm.io/secret-name: caikit-embeddings-cos
+    ibm.io/bucket: caikit-embeddings-models-config
+    volume.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
+    ibm.io/auto-delete-bucket: 'false'
+  finalizers:
+    - kubernetes.io/pvc-protection
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: '1'
+  storageClassName: ibmc-s3fs-smart-regional
+  volumeMode: Filesystem

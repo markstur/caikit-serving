@@ -2,28 +2,54 @@
 
 Deployment config for caikit embeddings.
 
+### Set the Image Pull secret
+
+Copy credentials obtained from the container registry owner into environment variable
+```bash
+export ICR_APIKEY=<icr-credential>
+```
+Copy credential into secret and link to default service account
+```bash
+oc create secret docker-registry icr-caikit-image \
+  --docker-server=icr.io --docker-username=iamapikey \
+  --docker-password=${ICR_APIKEY} --docker-email=iamapikey
+oc secrets link serviceaccount/default secrets/ icr-caikit-image --for=pull
+```
+
+### Add components to Helm repo
+This pattern should be followed for every additional component
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami 
+helm repo update
+helm dependency update
+```
+
 ## Deploy the Service
 
-1. Connect to OCP cluser and desired project or create new one;
-
-2. Get the OCP host and domain through the UI or:
-```sh
-oc get IngressController default -n openshift-ingress-operator -o jsonpath='{ .status.domain}'
-```
-Replace the host domain values at the router config at [deployment-caikit-embeddings.yaml](./deployment-caikit-embeddings.yaml).
-
-3. Create the deployment using the file [deployment-caikit-embeddings.yaml](./deployment-caikit-embeddings.yaml)
- - Remember to point the `imagePullSecrets` name to the secrets where the icr iam key is kept.
- - Check if there are other values that need to be updated with variables or your cluster information.
-   
-4. You can apply the whole config yaml with the following command:
+1. Connect to OCP cluser and desired project or create new one, get the COS credentials and fill in the `.env`. Copy/create from the `.env-example` that has all variables' needed. 
 ```bash
-oc apply -f deployment-caikit-embeddings.yaml
+export export $(cat .env | xargs)
+``` 
+2. Export the variable `MODEL_NAME` with the path of the main model, such as `sentence-transformers/all-minilm-l6-v2` or the desired model ID;
+3. The run:
+```bash
+export MODEL_NAME=$(sed 's/\//\-/g' <<< "$MODEL_NAME")
 ```
+If the model name has the dot character, eg. `all-minilm-l6-v2.23`, you need to also run:
+```bash
+export MODEL_NAME=$(sed 's/\./\-/g' <<< "$MODEL_NAME")
+```
+> This is needed for the naming convention of each of the models' deployments
 
-Or you can create at the cluster GUI each of the components, the deployment, services, secrets and routes. 
-
-5. Go to browser and access the route at `https://caikit-embeddings-route-<oc-project>.<oc-host>.<oc-domain>/docs` and you will be able to see swagger documentation for the API.
+And finally:
+```bash
+export FULL_NAME_OVERRIDE=caikit-embeddings-$MODEL_NAME
+```
+4. Then install the helm chart with:
+```bash
+cd charts
+helm upgrade --install --history-max=2-n $OC_PROJECT_NAME --set secrets.cosAccesskey=$COS_ACCESS_KEY --set fullnameOverride=$FULL_NAME_OVERRIDE secrets.cosSecretkey=$COS_SECRET_KEY —set $HELM_NAME .
+``` 
 
 ## Conditional GPU Allocation
 
@@ -50,7 +76,7 @@ Under `spec > spec > container > resources`, the above lines provide the GPU ava
       port: 8085
       targetPort: 8085
 ```
-2. Create a deployment using the file [deployment-caikit-emb-grpc-ui.yaml](deployment-caikit-emb-grpc-ui.yaml).
+2. Create a deployment using the file [deployment-caikit-emb-grpc-ui.yaml](./deployment-files/deployment-caikit-emb-grpc-ui.yaml).
 
 ```bash
 oc apply -f deployment-caikit-emb-grpc-ui.yaml
