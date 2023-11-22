@@ -2,6 +2,7 @@
 
 # Assume user is logged into OCP cluster
 # Assume script is being run from ./deployment/charts directory
+# A ${MODEL}-values.yaml file was created for the new model
 # There are 4 arguments to shell: namespace, model-id (by convention, model-id should ALWAYS be lower-cased), cos access and secret keys
 ###############
 # Special Note: For first time deployments into a NEW namespace, copy in the 'first-time-only' folder into the templates folder for the first model deployment Only.
