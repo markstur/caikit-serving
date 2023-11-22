@@ -48,7 +48,7 @@ export FULL_NAME_OVERRIDE=caikit-embeddings-$MODEL_NAME
 4. Then install the helm chart with:
 ```bash
 cd charts
-helm upgrade --install --history-max=2-n $OC_PROJECT_NAME --set secrets.cosAccesskey=$COS_ACCESS_KEY --set fullnameOverride=$FULL_NAME_OVERRIDE secrets.cosSecretkey=$COS_SECRET_KEY —set $HELM_NAME .
+helm upgrade --install --history-max=2 -n $OC_PROJECT_NAME -f values.yaml --set secrets.cosAccesskey=$COS_ACCESS_KEY,fullnameOverride=$FULL_NAME_OVERRIDE,secrets.cosSecretkey=$COS_SECRET_KEY $HELM_NAME .
 ``` 
 
 ## Conditional GPU Allocation
