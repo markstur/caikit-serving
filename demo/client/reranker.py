@@ -29,6 +29,8 @@ import caikit
 from google.protobuf.struct_pb2 import Struct
 
 if __name__ == "__main__":
+    model_id = getenv("MODEL", "mini")
+
     # Add the runtime/library to the path
     sys.path.append(
         path.abspath(path.join(path.dirname(__file__), "../../"))
@@ -43,8 +45,6 @@ if __name__ == "__main__":
     inference_service = ServicePackageFactory().get_service_package(
         ServicePackageFactory.ServiceType.INFERENCE,
     )
-
-    model_id = getenv("MODEL", "mini")
 
     top_n = 3
     queries = ["first sentence", "any sentence"]
@@ -101,16 +101,6 @@ if __name__ == "__main__":
 
     if get_config().runtime.http.enabled:
         # REST payload
-        payload = {"queries": queries, "documents": {"documents": documents}}
-        payload = {
-            "model_id": model_id,
-            "inputs": {
-                "documents": {"documents": documents},
-                "queries": queries,
-                "top_n": 2,
-            }
-        }
-
         payload = {
             "inputs": {
                 "documents": documents,
@@ -122,7 +112,7 @@ if __name__ == "__main__":
                 "return_queries": True,
                 "return_text": True
             },
-            "model_id": "slate-er"
+            "model_id": model_id
         }
         response = requests.post(
             f"http://{host}:8080/api/v1/task/rerank-tasks",
