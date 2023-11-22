@@ -60,4 +60,4 @@ response = client_stub.SentenceSimilarityTaskPredict(
 # Print response
 print("SOURCE SENTENCE: ", source_sentence)
 print("SENTENCES: ", sentences)
-print("RESULTS: ", [v for v in response.scores])
+print("RESULTS: ", [v for v in response.result.scores])
