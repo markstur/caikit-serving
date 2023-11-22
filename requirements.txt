@@ -1,2 +1,3 @@
-caikit[runtime-grpc,runtime-http]@file:///users/markstur/gh/caikit
-caikit-nlp[sentence-transformers]@file:///users/markstur/caikit-nlp
+caikit-nlp[sentence-transformers]@git+https://github.com/markstur/caikit-nlp@embedding_prs
+sentence-transformers
+
