@@ -41,13 +41,13 @@ spec:
             - cd demo/server && python start_runtime.py
           env:
             - name: IPEX_OPTIMIZE
-              value: {{ .Values.variables.IPEX_OPTIMIZE }}
+              value: "{{ .Values.variables.IPEX_OPTIMIZE }}"
             - name: USE_XPU
-              value: {{ .Values.variables.USE_XPU }}
+              value: "{{ .Values.variables.USE_XPU }}"
             - name: USE_MPS
-              value: {{ .Values.variables.USE_MPS }}
+              value: "{{ .Values.variables.USE_MPS }}"
             - name: PT2_COMPILE
-              value: {{ .Values.variables.PT2_COMPILE }}
+              value: "{{ .Values.variables.PT2_COMPILE }}"
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
