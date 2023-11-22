@@ -1,29 +1,5 @@
 # Caikit Text Embedding
 
----
-
-## NEW!
-
-Run caikit-runtime configured to use the caikit-nlp library.
-
-```bash
-pip install -r requirements.txt
-CONFIG_FILES=config.yml caikit-runtime
-```
-
-> NOTE!!!
-> The GUID is now lower-case!
-
-## BOOTSTRAP!!!
-
-```
-(venv39) markstur@Marks-MacBook-Pro-3 caikit-serving % ./demo/server/bootstrap_model.py -m sentence-transformers/all-MiniLM-L6-v2 -o demo/models/mini
-```
-
-
----
-
-
 Caikit service for embeddings.
 
 | Task                    | Module(s)                                      | Salient Feature(s)                                                                                                                                                         |
@@ -71,9 +47,9 @@ This can be done by running the `boostrap_model.py` script in your virtual envir
 
 ```shell
 source venv/bin/activate
-cd demo/server
-./bootstrap_model.py -m <MODEL_NAME_OR_PATH> -o <OUTPUT_DIR>
+./demo/server/bootstrap_model.py -m <MODEL_NAME_OR_PATH> -o <OUTPUT_DIR>
 ```
+
 
 To avoid overwriting your files, the save() will return an error if the output directory already exists. You may want to use a temporary name. After success, move the output directory to a `<model-id>` directory under your local models dir.
 
@@ -82,12 +58,14 @@ To avoid overwriting your files, the save() will return an error if the output d
 
 ### Starting the Caikit Runtime
 
+Run caikit-runtime configured to use the caikit-nlp library.
+
 In one terminal, start the runtime server:
 
-```shell
+```bash
 source venv/bin/activate
-cd demo/server
-python start_runtime.py
+pip install -r requirements.txt
+CONFIG_FILES=config.yml caikit-runtime
 ```
 
 ### Embedding retrieval example Python client
@@ -157,14 +135,14 @@ DOCUMENTS:  [{'text': 'first sentence', 'title': 'first title'}, {'_text': 'anot
 RESPONSE from gRPC:
 ===
 QUERY:  first sentence
-  score: 1.0000001192092896  index: 0  text: first sentence
-  score: 0.6204259991645813  index: 1  text: another sentence
-  score: 0.11101679503917694  index: 2  text: a doc with a nested metadata
+  score: 0.9999997019767761  index: 0  text: first sentence
+  score: 0.7350112199783325  index: 1  text: another sentence
+  score: 0.10398174077272415  index: 2  text: a doc with a nested metadata
 ===
 QUERY:  any sentence
-  score: 0.5091423988342285  index: 1  text: another sentence
-  score: 0.42496341466903687  index: 0  text: first sentence
-  score: 0.0962495356798172  index: 2  text: a doc with a nested metadata
+  score: 0.6631797552108765  index: 0  text: first sentence
+  score: 0.6505964398384094  index: 1  text: another sentence
+  score: 0.11903437972068787  index: 2  text: a doc with a nested metadata
 ===================
 RESPONSE from HTTP:
 {
@@ -178,7 +156,7 @@ RESPONSE from HTTP:
                         "title": "first title"
                     },
                     "index": 0,
-                    "score": 1.0000001192092896,
+                    "score": 0.9999997019767761,
                     "text": "first sentence"
                 },
                 {
@@ -187,7 +165,7 @@ RESPONSE from HTTP:
                         "more": "more attributes here"
                     },
                     "index": 1,
-                    "score": 0.6204259991645813,
+                    "score": 0.7350112199783325,
                     "text": "another sentence"
                 },
                 {
@@ -200,7 +178,7 @@ RESPONSE from HTTP:
                         }
                     },
                     "index": 2,
-                    "score": 0.11101679503917694,
+                    "score": 0.10398174077272415,
                     "text": "a doc with a nested metadata"
                 }
             ]
@@ -210,21 +188,21 @@ RESPONSE from HTTP:
             "scores": [
                 {
                     "document": {
-                        "_text": "another sentence",
-                        "more": "more attributes here"
-                    },
-                    "index": 1,
-                    "score": 0.5091423988342285,
-                    "text": "another sentence"
-                },
-                {
-                    "document": {
                         "text": "first sentence",
                         "title": "first title"
                     },
                     "index": 0,
-                    "score": 0.42496341466903687,
+                    "score": 0.6631797552108765,
                     "text": "first sentence"
+                },
+                {
+                    "document": {
+                        "_text": "another sentence",
+                        "more": "more attributes here"
+                    },
+                    "index": 1,
+                    "score": 0.6505964398384094,
+                    "text": "another sentence"
                 },
                 {
                     "document": {
@@ -236,12 +214,16 @@ RESPONSE from HTTP:
                         }
                     },
                     "index": 2,
-                    "score": 0.0962495356798172,
+                    "score": 0.11903437972068787,
                     "text": "a doc with a nested metadata"
                 }
             ]
         }
-    ]
+    ],
+    "producer_id": {
+        "name": "EmbeddingModule",
+        "version": "0.0.1"
+    }
 }
 ```
 
