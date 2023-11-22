@@ -59,8 +59,9 @@ response = client_stub.EmbeddingTasksPredict(
 # Print response
 print("INPUTS TEXTS: ", texts)
 print("RESULTS: [")
-for d in response.results:
+for d in response.results.vectors:
     woo = d.WhichOneof("data")  # which one of data_<float_type>s did we get?
     print(getattr(d, woo).values)
 print("]")
-print("LENGTH: ", len(response.results), " x ", len(getattr(response.results[0], woo).values))
+print("LENGTH: ", len(response.results.vectors), " x ",
+      len(getattr(response.results.vectors[0], woo).values))
