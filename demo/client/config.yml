@@ -16,7 +16,7 @@
 # Caikit model configuration
 # Relative paths are relative to where the config is loaded
 runtime:
-    library: caikit_embeddings
+    library: caikit_nlp
 
     # All models in this directory are loaded at boot time
     local_models_dir: "../models"
