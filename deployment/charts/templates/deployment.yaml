@@ -38,7 +38,7 @@ spec:
           command:
             - bash
             - '-c'
-            - cd demo/server && python start_runtime.py
+            - CONFIG_FILES=config.yml caikit-runtime
           env:
             - name: IPEX_OPTIMIZE
               value: "{{ .Values.variables.IPEX_OPTIMIZE }}"
