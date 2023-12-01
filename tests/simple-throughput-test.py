@@ -15,7 +15,7 @@ from caikit.runtime.service_factory import ServicePackageFactory
 
 # Add the runtime/library to the path
 sys.path.append(
-    path.abspath(path.join(path.dirname(__file__), "../../"))
+    path.abspath(path.join(path.dirname(__file__), "../demo/client"))
 )
 
 # Load configuration for Caikit runtime
@@ -24,7 +24,7 @@ caikit.configure(CONFIG_PATH)
 
 # NOTE: The model id needs to be a path to folder.
 # NOTE: This is relative path to the models directory
-MODEL_ID = os.getenv("MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+MODEL_ID = os.getenv("MODEL", "sentence-transformers/all-minilm-l6-v2")
 
 inference_service = ServicePackageFactory().get_service_package(
     ServicePackageFactory.ServiceType.INFERENCE,
@@ -33,8 +33,22 @@ inference_service = ServicePackageFactory().get_service_package(
 port = os.getenv('CAIKIT_EMBEDDINGS_PORT') if os.getenv('CAIKIT_EMBEDDINGS_PORT') else 443
 host = os.getenv('CAIKIT_EMBEDDINGS_HOST') if os.getenv('CAIKIT_EMBEDDINGS_HOST') else 'localhost'
 
-channel = grpc.insecure_channel(f"{host}:{port}")
+
+# mTLS is required through the router, insecure for direct testing against model
+if (os.getenv('CAIKIT_EMBEDDINGS_CACERT')):
+    ca_cert_file = os.getenv('CAIKIT_EMBEDDINGS_CACERT')
+    cert_file = os.getenv('CAIKIT_EMBEDDINGS_CERT')
+    key_file = os.getenv('CAIKIT_EMBEDDINGS_KEY')
+    root_cert = open(ca_cert_file).read().encode()
+    cert = open(cert_file).read().encode()
+    key = open(key_file).read().encode()
+    credentials = grpc.ssl_channel_credentials(root_cert, key, cert)
+    channel = grpc.secure_channel(host + ':' + str(port), credentials)
+else:
+    channel = grpc.insecure_channel(f"{host}:{port}")
+
 client_stub = inference_service.stub_class(channel)
+
 
 # Test control parameter
 ITERATIONS = 100
@@ -60,31 +74,27 @@ with open(os.getenv('DATASET')) as f:
 
 if __name__ == '__main__':
 
-    def run():
+    def run(warmup):
         request = inference_service.messages.EmbeddingTasksRequest(texts=texts_dataset)
         # Fetch predictions from server (infer)
         response = client_stub.EmbeddingTasksPredict(
             request, metadata=[("mm-model-id", MODEL_ID)]
         )
         # Print response
-        print("INPUTS TEXTS: ", texts_dataset)
-        print("RESULTS: [")
-        for d in response.results:
-            woo = d.WhichOneof("data")  # which one of data_<float_type>s did we get?
-            print(getattr(d, woo).values)
-        print("]")
-        print("LENGTH: ", len(response.results), " x ", len(getattr(response.results[0], woo).values))
+        if warmup:
+            print("INPUTS TEXTS: ", texts_dataset)
+            print("RESULTS: ", response.results)
 
     def getLatency(lat,i):
         s = timeit.default_timer()
-        run()
+        run(False)
         lat[i] = timeit.default_timer() - s
 
     tik = timeit.default_timer()
     print(f"Starting warmup with {INITIAL_WARMUP_CYCLES} cycles...")
     # INITIAL_WARMUP_CYCLES
     for i in range(INITIAL_WARMUP_CYCLES):
-        run()
+        run(True)
     tok = timeit.default_timer()
 
     print(f"Warmup terminated in {tok - tik} sec.")
@@ -106,7 +116,7 @@ if __name__ == '__main__':
     latList = list(filter(lambda x: x is not None, latList))
 
     lat= np.array(latList)
-    print('**** THROUGHPUT TEST REPORT ****')
+    print('**** THROUGHPUT TEST REPORT for ' + MODEL_ID + ' at ' + host +  ' ****')
     print("Total Requests: ", ITERATIONS)
     print("Requests per Sec: ", REQUESTS_PER_SEC)
     print("Requests Served: ", len(latList))

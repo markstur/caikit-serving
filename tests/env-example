@@ -1,5 +1,35 @@
-CAIKIT_EMBEDDINGS_CACERT=
-CAIKIT_EMBEDDINGS_HOST=
-CAIKIT_EMBEDDINGS_PORT=
-DATASET=
-INITIAL_WARMUP_CYCLES=
+Current models
+--------------
+export MODEL=sentence-transformers/all-minilm-l6-v2
+export MODEL=ibm/slate.30m.english.rtrvr-26.10.2023
+
+From a pod, through the Embeddings Router (mTLS)
+------------------------------------------------
+export CAIKIT_EMBEDDINGS_CACERT=.../server-ca-crt.pem
+export CAIKIT_EMBEDDINGS_CERT=.../tls.crt.pem
+export CAIKIT_EMBEDDINGS_KEY=.../tls.key.pem
+
+#Router endpt:
+export CAIKIT_EMBEDDINGS_HOST=fmaas-embeddings-fmaas-mig.apps.fmaas-devstage-backend.fmaas.res.ibm.com
+export CAIKIT_EMBEDDINGS_PORT=443
+
+export CONFIG_PATH=.../demo/client/config.yml
+export DATASET=.../questions.tsv
+export INITIAL_WARMUP_CYCLES=2
+
+
+From a pod, Direct to model, no Router, insecure channel -plaintext
+-------------------------------------------------------------------
+**** CAIKIT_EMBEDDINGS_CACERT env var must not exist in env (None) ****
+
+export CAIKIT_EMBEDDINGS_HOST=caikit-embeddings-sentence-transformers-all-minilm-l6-v2.embeddings-dev
+or
+export CAIKIT_EMBEDDINGS_HOST=caikit-embeddings-ibm-slate-30m-english-rtrvr.embeddings-dev
+
+export CAIKIT_EMBEDDINGS_PORT=8085
+export CONFIG_PATH=..../demo/client/config.yml
+export DATASET=..../questions.tsv
+export INITIAL_WARMUP_CYCLES=2
+
+
+
