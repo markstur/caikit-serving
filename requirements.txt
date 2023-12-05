@@ -1,3 +1,3 @@
-caikit-nlp@git+https://github.com/markstur/caikit-nlp@no_decode
+caikit-nlp@git+https://github.com/markstur/caikit-nlp@9547c96
 sentence-transformers>=2.2.2,<2.3.0
 
