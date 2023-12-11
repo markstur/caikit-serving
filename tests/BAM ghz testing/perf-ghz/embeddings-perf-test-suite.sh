@@ -22,6 +22,7 @@ for model in ${MODELS[@]}; do
          --call caikit.runtime.Nlp.NlpService.EmbeddingTasksPredict \
          --concurrency=${concur} \
          --connections=${concur} \
+         --timeout=180s \
          --cpus=16 \
          --lb-strategy='round_robin' \
          --duration 30s \
