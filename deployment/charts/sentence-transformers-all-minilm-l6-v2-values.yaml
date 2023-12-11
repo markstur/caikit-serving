@@ -8,7 +8,7 @@ image:
   repository: icr.io/fm-stack/caikit-embeddings
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 0.0.3
+  tag: 0.0.4
 
 imagePullSecrets: []
 nameOverride:
@@ -60,17 +60,17 @@ variables:
   PT2_COMPILE: false
   COS_MOUNT_PATH: /opt/app-root/src/demo/models/
 
-resources: {}
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: '12'
+    memory: 32G
+  requests:
+    cpu: '8'
+    memory: 16G
 
 autoscaling:
   enabled: false

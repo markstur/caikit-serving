@@ -8,7 +8,7 @@ image:
   repository: icr.io/fm-stack/caikit-embeddings
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 0.0.3
+  tag: 0.0.4
 
 imagePullSecrets: []
 nameOverride:
@@ -57,12 +57,17 @@ variables:
   IPEX_OPTIMIZE: false
   USE_XPU: false
   USE_MPS: false
-  PT2_COMPILE: false
+  PT2_COMPILE: true
   COS_MOUNT_PATH: /opt/app-root/src/demo/models/
 
 resources:
   limits:
+    cpu: '12'
+    memory: 32G
     nvidia.com/gpu: '1'
+  requests:
+    cpu: '8'
+    memory: 16G
 
 autoscaling:
   enabled: false
