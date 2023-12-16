@@ -21,9 +21,9 @@ for model in ${MODELS[@]}; do
 
       echo "Running Embeddings Performance test for ${model} with dataset: ${load} and a concurrency level=${concur}"
       /tmp/perf-ghz/ghz \
-         --cacert /tmp/perf-ghz/ca-cert.pem \
-         --cert /tmp/perf-ghz/server-cert.pem \
-         --key /tmp/perf-ghz/server-key.pem \
+         --cacert /tmp/perf-ghz/devstage-ca-cert.pem \
+         --cert /tmp/perf-ghz/devstage-server-cert.pem \
+         --key /tmp/perf-ghz/devstate-server-key.pem \
          --proto /tmp/perf-ghz/protos/nlpservice.proto \
          --call caikit.runtime.Nlp.NlpService.EmbeddingTasksPredict \
          --concurrency=${concur} \
@@ -35,7 +35,7 @@ for model in ${MODELS[@]}; do
          --duration-stop wait \
          --metadata='{"mm-model-id": "'${model}'"}' \
          --data-file=/tmp/perf-ghz/${load} \
-        fmaas-embeddings-fmaas-internal-embeddings.apps.fmaas-backend.fmaas.res.ibm.com:443
+        fmaas-embeddings-fmaas-mig.apps.fmaas-devstage-backend.fmaas.res.ibm.com:443
     done
   done
 done
