@@ -2,13 +2,13 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+replicaCount: 2
 
 image:
   repository: icr.io/fm-stack/caikit-embeddings
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 0.0.4
+  tag: 0.4.0
 
 imagePullSecrets: []
 nameOverride:
@@ -57,7 +57,7 @@ variables:
   IPEX_OPTIMIZE: false
   USE_XPU: false
   USE_MPS: false
-  PT2_COMPILE: false
+  PT2_COMPILE: true
   RUNTIME_SERVER_THREAD_POOL_SIZE: 5
   COS_MOUNT_PATH: /opt/app-root/src/demo/models/
   RETRY_COUNT: 0
@@ -66,13 +66,10 @@ variables:
   RUNTIME_USE_ABORTABLE_THREADS: false
 
 resources:
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: '12'
+    cpu: '11'
     memory: 32G
+    nvidia.com/gpu: '1'
   requests:
     cpu: '8'
     memory: 16G

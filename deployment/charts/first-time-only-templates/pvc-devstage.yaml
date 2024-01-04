@@ -4,7 +4,6 @@ metadata:
   name: pvc-caikit-embeddings-cos
   annotations:
     ibm.io/cos-service: ''
-    ibm.io/region: us-south
     ibm.io/endpoint: 'https://s3.direct.us-south.cloud-object-storage.appdomain.cloud'
     volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
     ibm.io/auto-create-bucket: 'false'
@@ -21,5 +20,5 @@ spec:
   resources:
     requests:
       storage: '1'
-  storageClassName: ibmc-s3fs-cos-perf
+  storageClassName: ibmc-s3fs-smart-regional
   volumeMode: Filesystem
