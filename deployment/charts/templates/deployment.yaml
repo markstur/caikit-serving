@@ -48,6 +48,18 @@ spec:
               value: "{{ .Values.variables.USE_MPS }}"
             - name: PT2_COMPILE
               value: "{{ .Values.variables.PT2_COMPILE }}"
+            - name: COS_MOUNT_PATH
+              value: "{{ .Values.variables.COS_MOUNT_PATH }}"
+            - name: RETRY_COUNT
+              value: "{{ .Values.variables.RETRY_COUNT }}"
+            - name: BATCH_SIZE
+              value: "{{ .Values.variables.BATCH_SIZE }}"
+            - name: RUNTIME_HTTP_ENABLED
+              value: "{{ .Values.variables.RUNTIME_HTTP_ENABLED }}"
+            - name: RUNTIME_USE_ABORTABLE_THREADS
+              value: "{{ .Values.variables.RUNTIME_USE_ABORTABLE_THREADS }}"
+            - name: RUNTIME_SERVER_THREAD_POOL_SIZE
+              value: "{{ .Values.variables.RUNTIME_SERVER_THREAD_POOL_SIZE }}"
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:

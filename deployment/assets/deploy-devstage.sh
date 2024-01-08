@@ -23,6 +23,6 @@ oc project ${OC_PROJECT}
 export OC_HOST=$(oc get IngressController default -n openshift-ingress-operator -o jsonpath='{ .status.domain}')
 
 helm dependency build
-helm upgrade --install --history-max=2 -n ${OC_PROJECT} --set secrets.cosAccessKey=$COS_ACCESS_KEY,secrets.cosSecretKey=$COS_SECRET_KEY,fullnameOverride=$FULL_NAME_OVERRIDE -f ${MODEL}-values.yaml $HELM_NAME .
+helm upgrade --install --history-max=2 -n ${OC_PROJECT} --set secrets.cosAccessKey=$COS_ACCESS_KEY,secrets.cosSecretKey=$COS_SECRET_KEY,fullnameOverride=$FULL_NAME_OVERRIDE -f ${MODEL}-values-devstage.yaml $HELM_NAME .
 
 
