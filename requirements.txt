@@ -1,3 +1,1 @@
-caikit-nlp@git+https://github.com/markstur/caikit-nlp@dev_bfloat16
-sentence-transformers>=2.2.2,<2.3.0
-intel-extension-for-pytorch
+caikit-nlp
