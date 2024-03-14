@@ -1,0 +1,27 @@
+runtime:
+  library: caikit_nlp
+  lazy_load_local_models: false
+  grpc:
+    enabled: true
+  http:
+    enabled: true
+
+model_management:
+  finders:
+    default:
+      type: REMOTE
+      config:
+        finder_priority:
+          - remote
+    remote:
+        import_class: caikit.runtime.client.RemoteModelFinder 
+        type: REMOTE
+        config:
+          connection:
+            hostname: caikit-embeddings-service.embeddings-sandbox.svc.cluster.local
+            port: 8085
+          supported_models:
+              all-minilm-l6-v2: eeb12558-b4fa-4f34-a9fd-3f5890e9cd3f
+          discover_models: true
+          test_connection: true
+          mm-model-id: all-minilm-l6-v2

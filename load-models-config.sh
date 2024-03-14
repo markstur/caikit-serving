@@ -1,0 +1,1 @@
+cd demo && cd models/sentence-transformers/all-MiniLM-L6-v2/artifacts && cd ../../../../ &&cd models/ibm/slate.rtvr271M/artifacts && cd ../../../../ && cd server
