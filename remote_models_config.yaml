@@ -1,0 +1,25 @@
+runtime:
+    library: caikit_nlp
+    lazy_load_local_models: true
+    local_models_dir: "/mnt/models"
+    grpc: { "enabled": True }
+    http: { "enabled": True }
+
+model_management:
+    finders:
+        default:
+            type: MULTI
+            config:
+            finder_priority:
+                - local
+        local:
+            type: REMOTE
+            config:
+                connection:
+                    hostname: "caikit-embeddings-service.embeddings-sandbox.svc.cluster.local"
+                    port: 8085
+                supported_models:
+                    sentence-transformers/all-minilm-l6-v2: eeb12558-b4fa-4f34-a9fd-3f5890e9cd3f
+                discover_models: false
+                test_connection: true
+                model_key: sentence-transformers/all-minilm-l6-v2
