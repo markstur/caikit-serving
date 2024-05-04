@@ -16,11 +16,14 @@
 import grpc
 from os import path
 import sys
+import json
 import os
+import requests
 
 # Local
 import caikit
 from caikit.runtime.service_factory import ServicePackageFactory
+from caikit.config.config import get_config
 
 # Add the runtime/library to the path
 sys.path.append(
@@ -35,7 +38,7 @@ caikit.configure(CONFIG_PATH)
 
 # NOTE: The model id needs to be a path to folder.
 # NOTE: This is relative path to the models directory
-MODEL_ID = os.getenv("MODEL", "sentence-transformers/mini")
+MODEL_ID = os.getenv("MODEL", "mini")
 
 inference_service = ServicePackageFactory().get_service_package(
     ServicePackageFactory.ServiceType.INFERENCE,
@@ -66,4 +69,20 @@ print("]")
 print("LENGTH: ", len(response.results.vectors), " x ",
       len(getattr(response.results.vectors[0], woo).values))
 
-print("response=", response)
+if get_config().runtime.http.enabled:
+    # REST payload
+    payload = {
+        "inputs": ["first sentence", "any sentence"],
+        "parameters": {
+            "truncate_input_tokens": -1,
+        },
+        "model_id": MODEL_ID
+    }
+    response = requests.post(
+        f"http://{host}:8080/api/v1/task/embedding-tasks",
+        json=payload,
+        timeout=1,
+    )
+    print("===================")
+    print("RESPONSE from HTTP:")
+    print(json.dumps(response.json(), indent=4))

@@ -49,21 +49,23 @@ client_stub = inference_service.stub_class(channel)
 # Create request object
 
 texts = ["test first sentence", "another test sentence"]
-request = inference_service.messages.EmbeddingTasksRequest(texts=texts)
+request = inference_service.messages.EmbeddingTaskRequest(text=texts[0])
 
 # Fetch predictions from server (infer)
-response = client_stub.EmbeddingTasksPredict(
+response = client_stub.EmbeddingTaskPredict(
     request, metadata=[("mm-model-id", MODEL_ID)]
 )
 
 # Print response
-print("INPUTS TEXTS: ", texts)
-print("RESULTS: [")
-for d in response.results.vectors:
-    woo = d.WhichOneof("data")  # which one of data_<float_type>s did we get?
-    print(getattr(d, woo).values)
-print("]")
-print("LENGTH: ", len(response.results.vectors), " x ",
-      len(getattr(response.results.vectors[0], woo).values))
-
 print("response=", response)
+
+print("INPUTS TEXTS: ", texts)
+print("RESULT: ")
+d = response.result
+woo = d.WhichOneof("data")  # which one of data_<float_type>s did we get?
+vals = getattr(d, woo).values
+print(vals)
+print("")
+print("LENGTH: ", "1", " x ",
+len(vals))
+
